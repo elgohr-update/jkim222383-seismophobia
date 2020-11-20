@@ -1,3 +1,9 @@
+# Scrape Earthquake Counts from the Web by US Census Region
+# by: Dustin Andrews
+# date: 2020/11/20
+# 
+# This needs to be updated for command line usage, and proper integration with original fivethirtyeight dataset script
+# TODO: Make sure this works with the original data set properly and is called as part of initial data collection script
 library(rvest)
 library(here)
 library(tidyverse, quietly = TRUE)
