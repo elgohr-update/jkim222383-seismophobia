@@ -9,3 +9,35 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r load libraries, message = FALSE}
+library(tidyverse)
+library(here)
+```
+
+```{r raw data, message = FALSE}
+earthquake <- read_csv(here('data', 'raw', 'earthquake_data.csv'))
+glimpse(earthquake)
+```
+
+```{r minor data wrangling before EDA, message = FALSE}
+earthquake_fct <- earthquake %>%
+  rename(worry_earthquake = 'In general, how worried are you about earthquakes?',
+         worry_big_one = 'How worried are you about the Big One, a massive, catastrophic earthquake?',
+         think_lifetime_big_one = 'Do you think the "Big One" will occur in your lifetime?',
+         experience_earthquake = 'Have you ever experienced an earthquake?',
+         prepared_earthquake = 'Have you or anyone in your household taken any precautions for an earthquake (packed an earthquake survival kit, prepared an evacuation plan, etc.)?',
+         familliar_san_andreas = 'How familiar are you with the San Andreas Fault line?',
+         familiar_yellowstone = 'How familiar are you with the Yellowstone Supervolcano?',
+         age = 'Age',
+         gender = 'What is your gender?',
+         household_income = 'How much total combined money did all members of your HOUSEHOLD earn last year?',
+         us_region = 'US Region') %>%
+  mutate_if(sapply(earthquake, is.character), as.factor)
+
+earthquake_fct
+```
+
+```{r prediction target}
+earthquake_fct$worry_earthquake %>%
+  levels()
+```
