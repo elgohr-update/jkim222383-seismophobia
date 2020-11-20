@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r load libraries, message = FALSE}
 library(tidyverse)
 library(here)
+library(ggthemes)
 ```
 
 ```{r raw data, message = FALSE}
@@ -86,3 +87,15 @@ earthquake_fct %>%
         axis.text.x = element_text(angle = 90))
 ```
 
+```{r eda, message=FALSE, warning=FALSE}
+# TODO: choose which correlations to show for EDA
+library(GGally)
+pairs_big <- earthquake_fct %>%
+  ggpairs()
+
+pairs_small <- earthquake_fct %>%
+  select(c(worry_earthquake, experience_earthquake, prepared_earthquake, familliar_san_andreas, familiar_yellowstone, age, gender, household_income)) %>%
+  ggpairs()
+
+pairs_small
+```
