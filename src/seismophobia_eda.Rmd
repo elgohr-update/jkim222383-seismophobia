@@ -32,12 +32,57 @@ earthquake_fct <- earthquake %>%
          gender = 'What is your gender?',
          household_income = 'How much total combined money did all members of your HOUSEHOLD earn last year?',
          us_region = 'US Region') %>%
+  mutate_all(na_if,"") %>% 
   mutate_if(sapply(earthquake, is.character), as.factor)
 
 earthquake_fct
 ```
 
-```{r prediction target}
+```{r - prediction target}
 earthquake_fct$worry_earthquake %>%
   levels()
 ```
+
+```{r - Summary Tables}
+earthquake_fct %>% 
+  group_by(worry_earthquake) %>% 
+  summarize(count = n()) %>% 
+  knitr::kable()
+```
+
+```{r - Class Distribution}
+earthquake_fct %>% 
+  ggplot() +
+    aes(x = worry_earthquake ,
+        color = worry_earthquake,
+        fill = worry_earthquake) +
+  geom_histogram(stat = "count") +
+  scale_fill_tableau() +
+  scale_colour_tableau() +
+  labs(x = "Worry Response",
+       y = "Count",
+       title = "Earthquake Worry Response Distribution") +
+  theme(legend.title = element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+```
+
+
+```{r - 2D Histograms, fig.height=7, fig.width=3}
+earthquake_fct %>% 
+  pivot_longer(!worry_earthquake, names_to = "feature", values_to = "value") %>% 
+  add_count(worry_earthquake, feature, value) %>%
+  ggplot() +
+    aes(x = value, 
+        y = worry_earthquake, 
+        fill = n) +
+  geom_tile(na.rm = TRUE) +
+  facet_wrap(. ~ feature, scale = "free", ncol = 2) +
+  scale_fill_viridis_c() +
+  theme_bw() +
+  theme(strip.text = element_text(size=10),
+        axis.text = element_text(size = 8),
+        axis.text.x = element_text(angle = 90))
+```
+
