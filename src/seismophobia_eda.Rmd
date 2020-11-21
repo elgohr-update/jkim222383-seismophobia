@@ -2,7 +2,10 @@
 title: "Seismophobia EDA"
 author: "Group 11 - Junghoo Kim, Dustin Burnham, Dustin Andrews, Trevor Kinsey"
 date: "11/21/2020"
-output: html_document
+output:
+  md_document: default
+  pdf_document: default
+  html_document: default
 ---
 
 ## Outline
@@ -22,10 +25,16 @@ library(ggthemes)
 ```{r raw data, message = FALSE}
 earthquake <- read_csv(here('data', 'raw', 'earthquake_data.csv'))
 
+# Before we go further, split into 30% test, 70% train
+set.seed(42)
+train_ratio = 0.7
+train_index <- sample(1:nrow(earthquake), train_ratio * nrow(earthquake))
+
 ```
 
 ```{r minor data wrangling before EDA, message = FALSE}
 earthquake_fct <- earthquake %>%
+  filter(row_number() %in% train_index) %>%
   rename(
     worry_earthquake = "In general, how worried are you about earthquakes?",
     worry_big_one = "How worried are you about the Big One, a massive, catastrophic earthquake?",
@@ -46,7 +55,7 @@ earthquake_fct <- earthquake %>%
 
 earthquake_fct %>%  
   head(10) %>% 
-  knitr::kable(caption = "Head of Earthquake Data Set")
+  knitr::kable(caption = "Head of Earthquake Data Set - Train Split ")
 ```
 ```{r}
 earthquake_fct %>%  
@@ -64,13 +73,13 @@ earthquake_fct$worry_earthquake %>%
 earthquake_fct %>% 
   group_by(worry_earthquake) %>% 
   summarize(count = n()) %>% 
-  knitr::kable(caption="Count of Different Target Levels")
+  knitr::kable(caption="Count of Different Target Levels in Training Set")
 ```
 ```{r - Summary Tables}
 earthquake_fct %>%
   is.na() %>%
   colSums() %>%
-  knitr::kable(col.names = "Count of NA's in Feature", caption="NA Count by Feature")
+  knitr::kable(col.names = "Count of NA's in Feature", caption="NA Count by Feature In Training Set")
 ```
 
 
@@ -86,7 +95,8 @@ earthquake_fct %>%
   scale_colour_tableau() +
   labs(x = "Worry Response",
        y = "Count",
-       title = "Earthquake Worry Response Distribution") +
+       title = "Earthquake Worry Response Distribution",
+       subtitle="Training Set") +
   theme(legend.title = element_blank(),
         axis.title.x=element_blank(),
         axis.text.x=element_blank(),

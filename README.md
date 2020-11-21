@@ -5,10 +5,6 @@ date: "11/19/2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ## Dataset
 
 We'll be working with the San Andreas Earthquake data set from [`fivethirtyeight`](https://github.com/fivethirtyeight/data/tree/master/san-andreas) which collected people's relative fear of earthquakes along with other demographic attributes such as age, gender, household income and region.
@@ -24,6 +20,8 @@ We will evaluate classifier performance using cross validation and pick the clas
 ## Exploratory Data Analysis Plan
 
 We will evaluate the raw data first for missing values, and determine if an imputation scheme is appropriate. Next we will look at linear correlations of the respective features in a correlation heat map. We will also look at a histogram of the target class distribution to get an approximate idea of the frequency of different responses.
+
+EDA document can be found here: [EDA Notebook](src/seismophobia_eda.md)
 
 ## Communication of Results
 
