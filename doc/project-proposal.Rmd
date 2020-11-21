@@ -15,7 +15,7 @@ We'll be working with the San Andreas Earthquake data set from [`fivethirtyeight
 
 ## Purpose
 
-We aim to determine a model for predicting a person's fear of earthquakes, given demographic features about that person. We will investigate a multi-class classifier, that can predict which relative level of fear a person has about earthquakes in addition to a binary classifier of if a person thinks a "Big One" will occur in their lifetime.
+We aim to determine a model for predicting a person's fear of earthquakes, given demographic features about that person. We will investigate a multi-class classifier, that can predict which relative level of fear a person has about earthquakes given their prior experience with earthquakes and demographic attributes.
 
 ## Plan
 
@@ -23,7 +23,7 @@ We will evaluate classifier performance using cross validation and pick the clas
 
 ## Exploratory Data Analysis Plan
 
-We will evaluate the raw data first for missing values, and determine if an imputation scheme is appropriate. Next we will look at linear correlations of the respective features in a correlation heat map. We will also look at a histogram of each feature to evaluate the approximate distributions we are observing.
+We will evaluate the raw data first for missing values, and determine if an imputation scheme is appropriate. Next we will look at linear correlations of the respective features in a correlation heat map. We will also look at a histogram of the target class distribution to get an approximate idea of the frequency of different responses.
 
 ## Communication of Results
 

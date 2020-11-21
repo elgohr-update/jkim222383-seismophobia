@@ -5,6 +5,10 @@ date: "11/21/2020"
 output: html_document
 ---
 
+## Outline
+
+This document will provide a first pass at an EDA of the `fivethirtyeight` San Andreas Earthquake data set.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -17,7 +21,7 @@ library(ggthemes)
 
 ```{r raw data, message = FALSE}
 earthquake <- read_csv(here('data', 'raw', 'earthquake_data.csv'))
-glimpse(earthquake)
+
 ```
 
 ```{r minor data wrangling before EDA, message = FALSE}
@@ -36,23 +40,40 @@ earthquake_fct <- earthquake %>%
     us_region = "US Region"
   ) %>%
   mutate_all(na_if, "") %>%
-  mutate_if(sapply(earthquake, is.character), as.factor) %>%
+  mutate_if(is.character, as.factor) %>%
+  select(-worry_big_one) %>%
   mutate(worry_earthquake = fct_relevel(worry_earthquake, c("Extremely worried", "Very worried", "Somewhat worried", "Not so worried", "Not at all worried")))
 
-earthquake_fct
+earthquake_fct %>%  
+  head(10) %>% 
+  knitr::kable(caption = "Head of Earthquake Data Set")
 ```
+```{r}
+earthquake_fct %>%  
+  tail(10) %>% 
+  knitr::kable(caption = "Tail of Earthquake Data Set")
+```
+
 
 ```{r - prediction target}
 earthquake_fct$worry_earthquake %>%
   levels()
 ```
 
-```{r - Summary Tables}
+```{r - Summary Tables of Target Count}
 earthquake_fct %>% 
   group_by(worry_earthquake) %>% 
   summarize(count = n()) %>% 
-  knitr::kable()
+  knitr::kable(caption="Count of Different Target Levels")
 ```
+```{r - Summary Tables}
+earthquake_fct %>%
+  is.na() %>%
+  colSums() %>%
+  knitr::kable(col.names = "Count of NA's in Feature", caption="NA Count by Feature")
+```
+
+
 
 ```{r - Class Distribution}
 earthquake_fct %>% 
@@ -73,32 +94,22 @@ earthquake_fct %>%
 ```
 
 
-```{r - 2D Histograms, fig.height=20, fig.width=10}
+```{r - 2D Histograms, fig.height=10, fig.width=10}
 earthquake_fct %>% 
   pivot_longer(!worry_earthquake, names_to = "feature", values_to = "value") %>% 
-  add_count(worry_earthquake, feature, value) %>%
+  add_count(worry_earthquake, feature, value) %>% 
   ggplot() +
     aes(x = value, 
         y = worry_earthquake, 
         fill = n) +
   geom_tile(na.rm = TRUE) +
-  facet_wrap(. ~ feature, scale = "free", ncol = 2) +
-  scale_fill_viridis_c() +
+  xlab("Feature") + 
+  ylab("How worried are you about an earthquake?") + 
+  facet_wrap(. ~ feature, scale = "free", ncol = 3) +
+  scale_fill_viridis_c(direction=-1) +
   theme_bw() +
   theme(strip.text = element_text(size=10),
         axis.text = element_text(size = 8),
         axis.text.x = element_text(angle = 90))
 ```
 
-```{r eda, message=FALSE, warning=FALSE}
-# TODO: choose which correlations to show for EDA
-library(GGally)
-pairs_big <- earthquake_fct %>%
-  ggpairs()
-
-pairs_small <- earthquake_fct %>%
-  select(c(worry_earthquake, experience_earthquake, prepared_earthquake, familliar_san_andreas, familiar_yellowstone, age, gender, household_income)) %>%
-  ggpairs()
-
-pairs_small
-```
