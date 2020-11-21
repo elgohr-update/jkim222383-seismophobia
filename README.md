@@ -21,7 +21,7 @@ We will evaluate classifier performance using cross validation and pick the clas
 
 We will evaluate the raw data first for missing values, and determine if an imputation scheme is appropriate. Next we will look at linear correlations of the respective features in a correlation heat map. We will also look at a histogram of the target class distribution to get an approximate idea of the frequency of different responses.
 
-EDA document can be found here: [EDA Notebook](./src/seismophobia.md)
+EDA document can be found here: [EDA Notebook](src/seismophobia.md)
 
 ## Communication of Results
 
