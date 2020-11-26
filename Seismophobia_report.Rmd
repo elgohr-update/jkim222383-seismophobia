@@ -1,0 +1,48 @@
+---
+title: "seismophobia_report"
+author: "Trevor Kinsey, Dustin Andrews, Dustin Burnham, Junghoo Kim"
+bibliography: earthquake_refs.bib
+date: "26/11/2020"
+output:
+  github_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(reticulate)
+```
+
+## Introduction
+
+To see who fears earthquakes
+
+
+## Data
+
+```{r load data, include = FALSE}
+
+
+```
+
+The data for this analysis was downloaded from ....
+
+## Methods
+
+The R programming language [@R]and the following R packages were used to perform the analysis: [@knitr] and [@tidyverse]. 
+The Python programming language [XXXXXXXX] and the following Python packages were used to perform the analysis: [XXXXXXXX] and [XXXXXXXXXXXX]
+The code used to perform the analysis and create this report can be found at: https://github.com/UBC-MDS/seismophobia
+
+
+## Results
+
+As you can see, we need to add information here
+
+```{r}
+
+```
+
+
+
+## References
