@@ -15,17 +15,25 @@ Options:
 library(tidyverse)
 library(docopt)
 library(here)
+library(testthat)
+
+# Default value for train_ratio
+DEFAULT_TRAIN_RATIO <- 0.7
+# Platform-depedent file separator (usually '/' or '\')
+FILE_SEP <- .Platform$file.sep
 
 opt <- docopt(doc)
-print(opt)
 
 main <- function(input_path, train_ratio, out_dir){
-  DEFAULT_TRAIN_RATIO = 0.7
   set.seed(2020)
   
   if (is.null(train_ratio)) {
     train_ratio = DEFAULT_TRAIN_RATIO
   }
+  
+  if (train_ratio < 0 | train_ratio > 1) stop ('train_ratio should be between 0 and 1!')
+  
+  train_ratio = as.numeric(train_ratio)
   
   # read data
   earthquake_raw <- read_csv(input_path)
@@ -61,10 +69,76 @@ main <- function(input_path, train_ratio, out_dir){
     dir.create(out_dir)
   })
   
-  write_csv(train_data, paste0(here(out_dir), '/train.csv'))
-  write_csv(test_data, paste0(here(out_dir), '/test.csv'))
+  write_csv(train_data, file.path(out_dir, 'train.csv', fsep = FILE_SEP))
+  write_csv(test_data, file.path(out_dir, 'test.csv', fsep = FILE_SEP))
 
 }  
-# TODO: Write tests
-  
+
+UNIT_TEST_PATH <- here('data', 'unit_test')
+TRAIN_DATA_PATH <- file.path(UNIT_TEST_PATH, 'train.csv', fsep = FILE_SEP)
+TEST_DATA_PATH <- file.path(UNIT_TEST_PATH, 'test.csv', fsep = FILE_SEP)
+
+if (opt[['out_dir']] == UNIT_TEST_PATH) {
+  stop('out_dir coincides with unit test path! Cannot run unit tests')
+}
+
+test_that("Unit test for pre_process_seismophobia.R using default train_ratio argument", {
+  main(opt[['input_path']], NULL, UNIT_TEST_PATH)
+  expect_that(UNIT_TEST_PATH, dir.exists, label = 'out_dir is not created')
+  expect_that(TRAIN_DATA_PATH, file.exists, label = 'train.csv is not created')
+  expect_that(TEST_DATA_PATH, file.exists, label = 'test.csv is not created')
+  df_raw <- read_csv(opt[['input_path']])
+  df_train <- read_csv(TRAIN_DATA_PATH)
+  df_test <- read_csv(TEST_DATA_PATH)
+  expect_equal(nrow(df_train), as.integer(nrow(df_raw) * DEFAULT_TRAIN_RATIO), 
+              label = 'train split has wrong number of rows')
+  expect_equal(nrow(df_test), nrow(df_raw) - nrow(df_train),
+              label = 'test split has wrong number of rows')
+  unlink(c(TRAIN_DATA_PATH, TEST_DATA_PATH))
+  if (length(list.files(UNIT_TEST_PATH)) == 0) {
+    unlink(UNIT_TEST_PATH, recursive = TRUE)
+  }
+})
+
+test_that("Unit test for pre_process_seismophobia.R using train_ratio argument of 0.3", {
+  main(opt[['input_path']], 0.3, UNIT_TEST_PATH)
+  expect_that(UNIT_TEST_PATH, dir.exists, label = 'out_dir is not created')
+  expect_that(TRAIN_DATA_PATH, file.exists, label = 'train.csv is not created')
+  expect_that(TEST_DATA_PATH, file.exists, label = 'test.csv is not created')
+  df_raw <- read_csv(opt[['input_path']])
+  df_train <- read_csv(TRAIN_DATA_PATH)
+  df_test <- read_csv(TEST_DATA_PATH)
+  expect_equal(nrow(df_train), as.integer(nrow(df_raw) * 0.3), 
+              label = 'train split has wrong number of rows')
+  expect_equal(nrow(df_test), nrow(df_raw) - nrow(df_train),
+              label = 'test split has wrong number of rows')
+  unlink(c(TRAIN_DATA_PATH, TEST_DATA_PATH))
+  if (length(list.files(UNIT_TEST_PATH)) == 0) {
+    unlink(UNIT_TEST_PATH, recursive = TRUE)
+  }
+})
+
+test_that("Unit test for pre_process_seismophobia.R using train_ratio argument of 1", {
+  main(opt[['input_path']], 1, UNIT_TEST_PATH)
+  expect_that(UNIT_TEST_PATH, dir.exists, label = 'out_dir is not created')
+  expect_that(TRAIN_DATA_PATH, file.exists, label = 'train.csv is not created')
+  expect_that(TEST_DATA_PATH, file.exists, label = 'test.csv is not created')
+  df_raw <- read_csv(opt[['input_path']])
+  df_train <- read_csv(TRAIN_DATA_PATH)
+  df_test <- read_csv(TEST_DATA_PATH)
+  expect_equal(nrow(df_train), nrow(df_raw), 
+              label = 'train split has wrong number of rows')
+  expect_equal(nrow(df_test), 0,
+              label = 'test split has wrong number of rows')
+  unlink(c(TRAIN_DATA_PATH, TEST_DATA_PATH))
+  if (length(list.files(UNIT_TEST_PATH))== 0) {
+    unlink(UNIT_TEST_PATH, recursive = TRUE)
+  }
+})
+
+test_that("train_ratio argument should be between 0 and 1", {
+  expect_error(main(opt[['input_path']], -0.1, UNIT_TEST_PATH))
+  expect_error(main(opt[['input_path']], 1.1, UNIT_TEST_PATH))
+})
+
 main(opt[['input_path']], opt[['train_ratio']], opt[['out_dir']])
