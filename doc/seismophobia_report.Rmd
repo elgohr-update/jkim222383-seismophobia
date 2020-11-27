@@ -1,0 +1,58 @@
+---
+title: "seismophobia_report"
+author: "Trevor Kinsey, Dustin Andrews, Dustin Burnham, Junghoo Kim"
+bibliography: seismophobia_refs.bib
+date: "26/11/2020"
+output:
+  github_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(reticulate)
+```
+
+## Summary
+We will build a random forest classification model that will whether someone is afraid of earthquakes based on their demographic information.
+
+## Introduction
+
+The damage that earthquakes cause can leave people without food, water, and shelter. Being prepared for an earthquake before it happens can make living through the immediate aftermath less traumatic (REFERENCE???). Having insurance that covers the damage caused by earthquakes can reduce the uncertainty and fear that the threat of earthquakes creates. People who are afraid of earthquakes represent a group of potential clients for companies selling earthquake preparedness products and insurance.
+
+We aim to predict groups in the population are afraid of earthquakes and thus are target demographics for advertising. If a machine learning algorithm can identify these groups it enable companies to build a marketing strategy based on this information.
+
+## Methods
+
+## Data
+
+The data for this analysis was downloaded from https://github.com/fivethirtyeight/data/tree/master/san-andreas. It is based on a survey conducted by ???????????????  in May 2015, of 1014 respondents in the US. 
+
+The dataset contains:
+ - demographic information (age, gender, household income, region), 
+ - responses to questions relating to knowledge of and experience with earthquakes,
+ - self-reported level of fear of earthquakes.
+
+We used the demographic information as features in random forest classifier 
+
+
+## Analysis
+
+We used the demographic information as features in random forest classifier 
+
+The R [@R] and Python [XXXXXXXX@python] programming languages and the following Python packages were used for this project: pandas [XXXXXXXX@pandas], sklearn [XXXXXXXXXXXX@sklearn], tidyverse [@tidyverse], knitr [@knitr] and docopt [XXXXXXXXXX@docopt].
+The code used to perform the analysis and create this report can be found at: https://github.com/UBC-MDS/seismophobia
+
+
+## Results
+
+As you can see, we need to add information here
+
+```{r}
+
+```
+
+
+
+## References
