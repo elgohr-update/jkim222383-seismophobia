@@ -3,9 +3,7 @@
 
 "Creates EDA plots for the pre-processes training subset of the seismophobia data set (https://github.com/fivethirtyeight/data/tree/master/san-andreas).
 Saves the plots as a pdf and png file.
-
 Usage: src/seismophobia_eda.R --data_path=<data_path> --out_dir=<out_dir>
-
 Options:
   --data_path=<data_path>     Path (including filename) to training data (csv file)
   --out_dir=<out_dir> Path to directory where the plots should be saved
@@ -54,7 +52,7 @@ main <- function(in_dir, out_dir) {
   earthquake %>% 
     pivot_longer(!worry_earthquake, names_to = "feature", values_to = "value") %>% 
     ggplot() +
-      aes(x = value) +
+    aes(x = value) +
     geom_histogram(bins = 10, stat = "count") +
     facet_wrap(. ~ feature, scales = 'free_x') +
     labs(x = "Features",
@@ -94,5 +92,6 @@ main <- function(in_dir, out_dir) {
   
   
 }
+
 
 main(opt[["--data_path"]], opt[["--out_dir"]])
