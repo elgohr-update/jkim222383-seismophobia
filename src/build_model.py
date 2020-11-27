@@ -51,6 +51,8 @@ import scipy.stats
 from docopt import docopt
 import typing
 
+from utils import get_column_names_from_ColumnTransformer
+
 # Graph styling setup
 plt.style.use("seaborn")
 
@@ -68,14 +70,12 @@ def get_data(file_path: str) -> pd.DataFrame:
     pandas.DataFrame:
         A pandas dataframe of the data
     """
-    if isinstance(file_path, str) != True:
-        print("Ensure the file path is numeric")
-        return
-
     try:
         data = pd.read_csv(file_path)
-    except:
+    except FileNotFoundError:
         raise Exception("Read file unsuccessful, check the file_path")
+    except ValueError:
+        raise Exception("Ensure file path is a string")
 
     return data
 
@@ -185,15 +185,26 @@ def run_modelling(training_set: pd.DataFrame, visuals_path: str) -> None:
 
     main_pipe.fit(X_train, y_train)
 
+    feature_select = main_pipe.named_steps["feature_select"]
+
     # Summary Scores
     cv_f1_score = cross_val_score(main_pipe, X_train, y_train, scoring=scoring, cv=cv)
     print(f"Final F1 CV Score: {np.mean(cv_f1_score):.3f}")
 
     # Build out plots to save
+
+    # Classification performance
     auc_roc_plot = plot_roc_curve(main_pipe, X_train, y_train)
     auc_roc_plot.figure_.savefig(
         f"{visuals_path}/roc_auc_curve.png", bbox_inches="tight"
     )
+
+    # Feature selection steps
+    feat_list = get_column_names_from_ColumnTransformer(preprocessor)
+    grid_scores = feature_select.grid_scores_
+    fig, ax = plt.subplots()
+    ax.plot(feat_list, grid_scores)
+    fig.savefig(f"{visuals_path}/feature_selection.png", bbox_inches="tight")
 
     return main_pipe
 

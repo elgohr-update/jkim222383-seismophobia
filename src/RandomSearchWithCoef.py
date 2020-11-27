@@ -1,6 +1,11 @@
+"""
+This allows for using RandomizedSearchCV within a RFE selector.
+Use in place of RandomizedSearchCV
+"""
+
 from sklearn.model_selection import RandomizedSearchCV
 
-# -------------------------------------------------
+
 class RandomizedSearchWithCoef(RandomizedSearchCV):
     @property
     def coef_(self):
