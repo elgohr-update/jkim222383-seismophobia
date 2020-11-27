@@ -22,6 +22,12 @@ main <- function(in_dir, out_dir) {
   # Read in data
   earthquake <- read.csv(in_dir)
   
+  # Remove survey questions
+  earthquake <- earthquake %>% 
+    select(-think_lifetime_big_one, -experience_earthquake, 
+           -prepared_earthquake, -familliar_san_andreas,
+           -familiar_yellowstone)
+  
   # Class Distribution
   earthquake %>% 
     ggplot() +
@@ -75,7 +81,7 @@ main <- function(in_dir, out_dir) {
     labs(x = "Features",
          y = "How worried are you about an earthquake?",
          title = "Feature Distributions Across Earthquake Fear") +
-    facet_wrap(. ~ feature, scale = "free", ncol = 3) +
+    facet_wrap(. ~ feature, scale = "free", ncol = 2) +
     scale_fill_viridis_c(direction=-1) +
     theme_bw() +
     theme(strip.text = element_text(size=10),
