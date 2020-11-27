@@ -186,6 +186,7 @@ def run_modelling(training_set: pd.DataFrame, visuals_path: str) -> None:
     main_pipe.fit(X_train, y_train)
 
     feature_select = main_pipe.named_steps["feature_select"]
+    feat_list = get_column_names_from_ColumnTransformer(preprocessor)
 
     # Summary Scores
     cv_f1_score = cross_val_score(main_pipe, X_train, y_train, scoring=scoring, cv=cv)
@@ -194,16 +195,19 @@ def run_modelling(training_set: pd.DataFrame, visuals_path: str) -> None:
     # Build out plots to save
 
     # Classification performance
-    auc_roc_plot = plot_roc_curve(main_pipe, X_train, y_train)
-    auc_roc_plot.figure_.savefig(
-        f"{visuals_path}/roc_auc_curve.png", bbox_inches="tight"
-    )
+    fig, ax = plt.subplots()
+    plot_roc_curve(main_pipe, X_train, y_train, ax=ax)
+    ax.set_title("Receiver Operating Characteristic Curve on Best Model")
+    fig.savefig(f"{visuals_path}/roc_auc_curve.png", bbox_inches="tight")
 
     # Feature selection steps
-    feat_list = get_column_names_from_ColumnTransformer(preprocessor)
     grid_scores = feature_select.grid_scores_
     fig, ax = plt.subplots()
-    ax.plot(feat_list, grid_scores)
+    ax.plot(np.arange(1, len(grid_scores) + 1), grid_scores)
+    ax.set_xlabel("Features In Model")
+    ax.set_ylabel("F1 Score")
+    ax.xaxis.set_tick_params(rotation=45)
+    ax.set_title("F1 Score with Recursive Feature Selection Process")
     fig.savefig(f"{visuals_path}/feature_selection.png", bbox_inches="tight")
 
     return main_pipe
