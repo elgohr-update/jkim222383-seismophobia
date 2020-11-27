@@ -20,6 +20,28 @@ main <- function(in_dir, out_dir) {
   # Read in data
   earthquake <- read.csv(in_dir)
   
+  # Class Distribution
+  earthquake %>% 
+    ggplot() +
+    aes(x = worry_earthquake ,
+        color = worry_earthquake,
+        fill = worry_earthquake) +
+    geom_histogram(stat = "count") +
+    scale_fill_tableau() +
+    scale_colour_tableau() +
+    labs(x = "Worry Response",
+         y = "Count",
+         title = "Earthquake Worry Response Distribution",
+         subtitle="Training Set") +
+    theme(legend.title = element_blank(),
+          axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank())
+  
+  ggsave(paste0(out_dir, "/target_distribution.png"), 
+         width = 8, 
+         height = 10)
+  
   # Generate histograms of each feature
   earthquake %>% 
     pivot_longer(!worry_earthquake, names_to = "feature", values_to = "value") %>% 
@@ -27,6 +49,9 @@ main <- function(in_dir, out_dir) {
     aes(x = value) +
     geom_histogram(bins = 10, stat = "count") +
     facet_wrap(. ~ feature, scales = 'free_x') +
+    labs(x = "Features",
+         y = "Counts",
+         title = "Distributions of Features") +
     theme_bw() +
     theme(strip.text = element_text(size=10),
           axis.text = element_text(size = 8),
@@ -45,8 +70,9 @@ main <- function(in_dir, out_dir) {
         y = worry_earthquake, 
         fill = n) +
     geom_tile(na.rm = TRUE) +
-    xlab("Feature") + 
-    ylab("How worried are you about an earthquake?") + 
+    labs(x = "Features",
+         y = "How worried are you about an earthquake?",
+         title = "Feature Distributions Across Earthquake Fear") +
     facet_wrap(. ~ feature, scale = "free", ncol = 3) +
     scale_fill_viridis_c(direction=-1) +
     theme_bw() +
@@ -55,8 +81,11 @@ main <- function(in_dir, out_dir) {
           axis.text.x = element_text(angle = 90))
   
   ggsave(paste0(out_dir, "/feature_distributions_accross_response.png"), 
-         width = 8, 
+         width = 10, 
          height = 10)
+  
+  
 }
 
-main(opt[["--data_path"]], opt[["--out_dir"]]) 
+
+main(opt[["--data_path"]], opt[["--out_dir"]])
