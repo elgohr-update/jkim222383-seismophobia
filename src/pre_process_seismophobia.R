@@ -1,4 +1,4 @@
-# author: Junghoo Kim
+# Autors: Group 11 (Dustin Burnham, Dustin Andrews, Trevor Kinsey, Junghoo Kim)
 # date: 2020-11-26
 
 "Cleans, splits and pre-processes (converts character columns into factors) the fear of earthquake data.
