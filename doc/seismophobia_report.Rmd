@@ -15,7 +15,7 @@ library(reticulate)
 ```
 
 ## Summary
-We will build a random forest classification model that will whether someone is afraid of earthquakes based on their demographic information.
+We will build a random forest classification model that will whether someone is afraid of earthquakes based on their demographic information. [I will put more information about the results here when I have them]
 
 ## Introduction
 
@@ -34,20 +34,21 @@ The dataset contains:
  - responses to questions relating to knowledge of and experience with earthquakes,
  - self-reported level of fear of earthquakes.
 
-We used the demographic information as features in random forest classifier 
+
 
 
 ## Analysis
 
-We used the demographic information as features in random forest classifier 
+We used a random forest classifier and for the prediction, which in addition to predicting gives a measure of importance for each feature. We chose to use only the demographic variables as model features because they are available in census data without having to conduct another survey. The prediction target is the self-reported fear of earthquakes, which we converted from an ordinal variable to a binary variable called `target`. `target` = 1 includes the levels _"not at all worried"_ and _"not so worried"_, while `target` = 1 includes _"somewhat worried"_, _"very worried"_, and _"extremely worried"_.  
 
-The R [@R] and Python [XXXXXXXX@python] programming languages and the following Python packages were used for this project: pandas [XXXXXXXX@pandas], sklearn [XXXXXXXXXXXX@sklearn], tidyverse [@tidyverse], knitr [@knitr] and docopt [XXXXXXXXXX@docopt].
+The R [@R] and Python [@van1995python] programming languages and the following Python packages were used for this project: pandas [@reback2020pandas], sklearn [@scikit-learn], tidyverse [@tidyverse], knitr [@knitr] and docopt [XXXXXXXXXX@docopt].
 The code used to perform the analysis and create this report can be found at: https://github.com/UBC-MDS/seismophobia
 
 
 ## Results
 
 As you can see, we need to add information here
+
 
 ```{r}
 
