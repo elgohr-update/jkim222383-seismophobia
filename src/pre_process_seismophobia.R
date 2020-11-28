@@ -56,7 +56,9 @@ main <- function(input_path, train_ratio, out_dir){
     mutate_all(na_if, "") %>%
     mutate_if(is.character, as.factor) %>%
     select(-worry_big_one) %>%
-    mutate(worry_earthquake = fct_relevel(worry_earthquake, c("Extremely worried", "Very worried", "Somewhat worried", "Not so worried", "Not at all worried")))
+    mutate(worry_earthquake = fct_relevel(worry_earthquake, c("Extremely worried", "Very worried", "Somewhat worried", "Not so worried", "Not at all worried"))) %>%
+    mutate(target = case_when(worry_earthquake %in% c("Not so worried", "Not at all worried") ~ 0,
+                              TRUE ~ 1))
   
   # Before we go further, split into train and test splits
   set.seed(42)
@@ -82,6 +84,7 @@ if (opt[['out_dir']] == UNIT_TEST_PATH) {
   stop('out_dir coincides with unit test path! Cannot run unit tests')
 }
 
+# Unit tests
 test_that("Unit test for pre_process_seismophobia.R using default train_ratio argument", {
   main(opt[['input_path']], NULL, UNIT_TEST_PATH)
   expect_that(UNIT_TEST_PATH, dir.exists, label = 'out_dir is not created')
@@ -102,9 +105,6 @@ test_that("Unit test for pre_process_seismophobia.R using default train_ratio ar
 
 test_that("Unit test for pre_process_seismophobia.R using train_ratio argument of 0.3", {
   main(opt[['input_path']], 0.3, UNIT_TEST_PATH)
-  expect_that(UNIT_TEST_PATH, dir.exists, label = 'out_dir is not created')
-  expect_that(TRAIN_DATA_PATH, file.exists, label = 'train.csv is not created')
-  expect_that(TEST_DATA_PATH, file.exists, label = 'test.csv is not created')
   df_raw <- read_csv(opt[['input_path']])
   df_train <- read_csv(TRAIN_DATA_PATH)
   df_test <- read_csv(TEST_DATA_PATH)
@@ -118,27 +118,10 @@ test_that("Unit test for pre_process_seismophobia.R using train_ratio argument o
   }
 })
 
-test_that("Unit test for pre_process_seismophobia.R using train_ratio argument of 1", {
-  main(opt[['input_path']], 1, UNIT_TEST_PATH)
-  expect_that(UNIT_TEST_PATH, dir.exists, label = 'out_dir is not created')
-  expect_that(TRAIN_DATA_PATH, file.exists, label = 'train.csv is not created')
-  expect_that(TEST_DATA_PATH, file.exists, label = 'test.csv is not created')
-  df_raw <- read_csv(opt[['input_path']])
-  df_train <- read_csv(TRAIN_DATA_PATH)
-  df_test <- read_csv(TEST_DATA_PATH)
-  expect_equal(nrow(df_train), nrow(df_raw), 
-              label = 'train split has wrong number of rows')
-  expect_equal(nrow(df_test), 0,
-              label = 'test split has wrong number of rows')
-  unlink(c(TRAIN_DATA_PATH, TEST_DATA_PATH))
-  if (length(list.files(UNIT_TEST_PATH))== 0) {
-    unlink(UNIT_TEST_PATH, recursive = TRUE)
-  }
-})
-
 test_that("train_ratio argument should be between 0 and 1", {
   expect_error(main(opt[['input_path']], -0.1, UNIT_TEST_PATH))
   expect_error(main(opt[['input_path']], 1.1, UNIT_TEST_PATH))
 })
+
 
 main(opt[['input_path']], opt[['train_ratio']], opt[['out_dir']])
