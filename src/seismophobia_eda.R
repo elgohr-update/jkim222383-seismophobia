@@ -21,7 +21,6 @@ main <- function(in_dir, out_dir) {
   earthquake <- read.csv(in_dir)
   
   # Remove survey questions
-  earthquake <- read.csv("data/processed/train.csv")
   earthquake <- earthquake %>% 
     select(-think_lifetime_big_one, -experience_earthquake, 
            -prepared_earthquake, -familliar_san_andreas,
@@ -29,6 +28,7 @@ main <- function(in_dir, out_dir) {
     mutate(labeled_target = ifelse(target == 1, "worried", "not worried")) %>% 
     mutate_if(is.character,as.factor)
   
+  # Change order of income variables to be numeric
   income_levels <- c("$0 to $9,999", "$10,000 to $24,999", "$25,000 to $49,999",
                      "$50,000 to $74,999", "$75,000 to $99,999", "$100,000 to $124,999",
                      "$125,000 to $149,999", "$150,000 to $174,999", "$175,000 to $199,999",
