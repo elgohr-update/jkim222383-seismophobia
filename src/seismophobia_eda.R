@@ -9,10 +9,10 @@ Options:
   --out_dir=<out_dir> Path to directory where the plots should be saved
 " -> doc
 
-library(tidyverse)
-library(docopt)
-library(here)
-library(ggthemes)
+suppressMessages(library(tidyverse))
+suppressMessages(library(docopt))
+suppressMessages(library(here))
+suppressMessages(library(ggthemes))
 
 opt <- docopt(doc)
 
