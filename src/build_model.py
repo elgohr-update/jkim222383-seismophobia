@@ -22,10 +22,6 @@ import random
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 
-# Feature selection
-from sklearn.feature_selection import RFECV
-from sklearn.impute import SimpleImputer
-
 # other
 from sklearn.metrics import (
     accuracy_score,
@@ -39,10 +35,8 @@ from sklearn.preprocessing import (
     OrdinalEncoder,
     PolynomialFeatures,
 )
+from sklearn.impute import SimpleImputer
 from sklearn.svm import SVC, SVR
-
-# Custom Random Search Class
-from RandomSearchWithCoef import RandomizedSearchWithCoef
 
 # For sampling distributions
 import scipy.stats
