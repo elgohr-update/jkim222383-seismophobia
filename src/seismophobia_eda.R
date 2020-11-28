@@ -43,7 +43,11 @@ main <- function(in_dir, out_dir) {
   earthquake %>% 
     ggplot() +
     aes(x = labeled_target) +
-    geom_histogram(stat = "count", color = "blue", fill = "blue") +
+    geom_bar(stat = "count", 
+             color = "blue", 
+             fill = "blue",
+             width = 0.4,
+             alpha = 0.6) +
     scale_fill_tableau() +
     scale_colour_tableau() +
     labs(x = "Survey Response",
