@@ -21,47 +21,57 @@ main <- function(in_dir, out_dir) {
   earthquake <- read.csv(in_dir)
   
   # Remove survey questions
+  earthquake <- read.csv("data/processed/train.csv")
   earthquake <- earthquake %>% 
     select(-think_lifetime_big_one, -experience_earthquake, 
            -prepared_earthquake, -familliar_san_andreas,
-           -familiar_yellowstone)
+           -familiar_yellowstone) %>% 
+    mutate(labeled_target = ifelse(target == 1, "worried", "not worried")) %>% 
+    mutate_if(is.character,as.factor)
   
+  income_levels <- c("$0 to $9,999", "$10,000 to $24,999", "$25,000 to $49,999",
+                     "$50,000 to $74,999", "$75,000 to $99,999", "$100,000 to $124,999",
+                     "$125,000 to $149,999", "$150,000 to $174,999", "$175,000 to $199,999",
+                     "$200,000 and up", "Prefer not to answer")
+  
+  earthquake['household_income'] <- factor(earthquake$household_income,
+                                           levels = income_levels)
+
   # Class Distribution
   earthquake %>% 
     ggplot() +
-    aes(x = worry_earthquake ,
-        color = worry_earthquake,
-        fill = worry_earthquake) +
-    geom_histogram(stat = "count") +
+    aes(x = labeled_target) +
+    geom_histogram(stat = "count", color = "blue", fill = "blue") +
     scale_fill_tableau() +
     scale_colour_tableau() +
-    labs(x = "Worry Response",
+    labs(x = "Survey Response",
          y = "Count",
          title = "Earthquake Worry Response Distribution",
          subtitle="Training Set") +
     theme(legend.title = element_blank(),
-          axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank())
-  
+          axis.text.x = element_text(angle = 90)) +
+    coord_flip()
+
   ggsave(paste0(out_dir, "/target_distribution.png"), 
          width = 8, 
          height = 10)
   
   # Generate histograms of each feature
   earthquake %>% 
-    pivot_longer(!worry_earthquake, names_to = "feature", values_to = "value") %>% 
+    select(-target, -worry_earthquake) %>% 
+    pivot_longer(!labeled_target, names_to = "feature", values_to = "value") %>% 
     ggplot() +
     aes(x = value) +
     geom_histogram(bins = 10, stat = "count") +
-    facet_wrap(. ~ feature, scales = 'free_x') +
+    facet_wrap(. ~ feature, scales = 'free') +
     labs(x = "Features",
          y = "Counts",
          title = "Distributions of Features") +
     theme_bw() +
     theme(strip.text = element_text(size=10),
           axis.text = element_text(size = 8),
-          axis.text.x = element_text(angle = 90))
+          axis.text.x = element_text(angle = 90)) +
+    coord_flip()
   
   ggsave(paste0(out_dir, "/feature_distributions.png"), 
          width = 8, 
@@ -69,11 +79,12 @@ main <- function(in_dir, out_dir) {
   
   # Distribution of variables in relation to target class
   earthquake %>% 
-    pivot_longer(!worry_earthquake, names_to = "feature", values_to = "value") %>% 
-    add_count(worry_earthquake, feature, value) %>% 
+    select(-worry_earthquake, -target) %>% 
+    pivot_longer(!labeled_target, names_to = "feature", values_to = "value") %>% 
+    add_count(labeled_target, feature, value) %>% 
     ggplot() +
     aes(x = value, 
-        y = worry_earthquake, 
+        y = labeled_target, 
         fill = n) +
     geom_tile(na.rm = TRUE) +
     labs(x = "Features",
@@ -84,13 +95,12 @@ main <- function(in_dir, out_dir) {
     theme_bw() +
     theme(strip.text = element_text(size=10),
           axis.text = element_text(size = 8),
-          axis.text.x = element_text(angle = 90))
+          axis.text.x = element_text(angle = 90)) +
+    coord_flip()
   
   ggsave(paste0(out_dir, "/feature_distributions_accross_response.png"), 
          width = 10, 
          height = 10)
-  
-  
 }
 
 
