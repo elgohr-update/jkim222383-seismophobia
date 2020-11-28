@@ -12,11 +12,16 @@ Options:
 library(tidyverse)
 library(docopt)
 library(here)
+library(testthat)
 library(ggthemes)
 
 opt <- docopt(doc)
 
 main <- function(in_dir, out_dir) {
+  
+  # Create out_dir if out_dir and any parent directories in the path do not exist
+  dir.create(out_dir, recursive = TRUE)
+  
   # Read in data
   earthquake <- read.csv(in_dir)
   
@@ -103,5 +108,42 @@ main <- function(in_dir, out_dir) {
          height = 10)
 }
 
+
+# Paths for running unit tests
+
+FILE_SEP <- .Platform$file.sep
+
+UNIT_TEST_PATH <- here('visuals', 'unit_test')
+EDA_PNG1_PATH <- file.path(UNIT_TEST_PATH,
+                           "target_distribution.png",
+                           fsep = FILE_SEP)
+EDA_PNG2_PATH <- file.path(UNIT_TEST_PATH,
+                           'feature_distributions.png',
+                           fsep = FILE_SEP)
+EDA_PNG3_PATH <- file.path(UNIT_TEST_PATH,
+                           'feature_distributions_accross_response.png',
+                           fsep = FILE_SEP)
+
+if (opt[['out_dir']] == UNIT_TEST_PATH) {
+  stop('out_dir coincides with unit test path! Cannot run unit tests')
+}
+
+# Unit tests
+test_that("Unit tests to make sure png files are created", {
+  main(opt[['--data_path']], UNIT_TEST_PATH)
+  expect_that(UNIT_TEST_PATH, dir.exists, label = 'out_dir is not created')
+  expect_that(EDA_PNG1_PATH, file.exists,
+              label = paste0(EDA_PNG1_PATH, ' is not created'))
+  expect_that(EDA_PNG2_PATH, file.exists,
+              label = paste0(EDA_PNG2_PATH, ' is not created'))
+  expect_that(EDA_PNG3_PATH, file.exists,
+              label = paste0(EDA_PNG3_PATH, ' is not created'))
+  # Delete png files created during unit test
+  unlink(c(EDA_PNG1_PATH, EDA_PNG2_PATH, EDA_PNG3_PATH))
+  # Delete folder created during unit test after checking it's empty
+  if (length(list.files(UNIT_TEST_PATH)) == 0) {
+    unlink(UNIT_TEST_PATH, recursive = TRUE)
+  }
+})
 
 main(opt[["--data_path"]], opt[["--out_dir"]])
