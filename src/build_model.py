@@ -90,6 +90,7 @@ def run_modelling(training_set: pd.DataFrame, visuals_path: str) -> None:
         training set split of Earthquake data, used with cross validation to determine best model
     visuals_path (str):
         file path to write visuals out to
+
     """
     # For reproducibility set seed
     random.seed(42)
@@ -152,24 +153,6 @@ def run_modelling(training_set: pd.DataFrame, visuals_path: str) -> None:
         steps=[
             ("preprocess", preprocessor),
             (
-                "feature_select",
-                RFECV(
-                    RandomizedSearchWithCoef(
-                        estimator=base_classifier,
-                        param_distributions=param_dists,
-                        cv=cv,
-                        scoring=scoring,
-                        refit=scoring,
-                        n_iter=n_feature_search,
-                        n_jobs=1,
-                    ),
-                    cv=cv,
-                    scoring=scoring,
-                    verbose=1,
-                    n_jobs=-2,
-                ),
-            ),
-            (
                 "clf",
                 RandomizedSearchCV(
                     estimator=base_classifier,
@@ -185,20 +168,19 @@ def run_modelling(training_set: pd.DataFrame, visuals_path: str) -> None:
 
     main_pipe.fit(X_train, y_train)
 
-    feature_select = main_pipe.named_steps["feature_select"]
     feat_list = get_column_names_from_ColumnTransformer(preprocessor)
 
     # Summary Scores
     cv_f1_score = cross_val_score(main_pipe, X_train, y_train, scoring=scoring, cv=cv)
     print(f"Final F1 CV Score: {np.mean(cv_f1_score):.3f}")
 
-    # Build out plots to save
+    # Build out plots to save----------------------------------------------------------
 
     # Classification performance
     fig, ax = plt.subplots()
     plot_roc_curve(main_pipe, X_train, y_train, ax=ax)
     ax.set_title("Receiver Operating Characteristic Curve on Best Model")
-    fig.savefig(f"{visuals_path}/roc_auc_curve.png", bbox_inches="tight")
+    fig.savefig(os.path.join(visuals_path, "roc_auc_curve.png"), bbox_inches="tight")
 
     # Feature selection steps
     grid_scores = feature_select.grid_scores_
@@ -208,7 +190,9 @@ def run_modelling(training_set: pd.DataFrame, visuals_path: str) -> None:
     ax.set_ylabel("F1 Score")
     ax.xaxis.set_tick_params(rotation=45)
     ax.set_title("F1 Score with Recursive Feature Selection Process")
-    fig.savefig(f"{visuals_path}/feature_selection.png", bbox_inches="tight")
+    fig.savefig(
+        os.path.join(visuals_path, "feature_selection.png"), bbox_inches="tight"
+    )
 
     return main_pipe
 
