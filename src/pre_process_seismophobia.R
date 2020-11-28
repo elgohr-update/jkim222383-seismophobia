@@ -12,10 +12,10 @@ Options:
 --out_dir=<out_dir>             Path to directory where the processed data should be written
 " -> doc
 
-library(tidyverse)
-library(docopt)
-library(here)
-library(testthat)
+suppressMessages(library(tidyverse))
+suppressMessages(library(docopt))
+suppressMessages(library(here))
+suppressMessages(library(testthat))
 
 # Default value for train_ratio
 DEFAULT_TRAIN_RATIO <- 0.7
