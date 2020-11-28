@@ -103,7 +103,7 @@ main <- function(in_dir, out_dir) {
           axis.text.x = element_text(angle = 90)) +
     coord_flip()
   
-  ggsave(paste0(out_dir, "/feature_distributions_accross_response.png"), 
+  ggsave(paste0(out_dir, "/feature_distributions_across_response.png"), 
          width = 10, 
          height = 10)
 }
@@ -121,7 +121,7 @@ EDA_PNG2_PATH <- file.path(UNIT_TEST_PATH,
                            'feature_distributions.png',
                            fsep = FILE_SEP)
 EDA_PNG3_PATH <- file.path(UNIT_TEST_PATH,
-                           'feature_distributions_accross_response.png',
+                           'feature_distributions_across_response.png',
                            fsep = FILE_SEP)
 
 if (opt[['out_dir']] == UNIT_TEST_PATH) {
