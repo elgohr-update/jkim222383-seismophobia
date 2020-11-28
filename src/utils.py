@@ -1,4 +1,5 @@
-from sklearn.preprocessing import OneHotEncoder, SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 
 

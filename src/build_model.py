@@ -4,31 +4,37 @@
 This script will read in a preprocessed data file from the fivethirtyeight Earthquake dataset, do some minor preprocessing, then run a modelling process to 
 build a classifier of whether a person is afraid of earthquakes or not.
 
-Usage: docopt.py --input_file_path=<input_file_path> --output_visuals_path=<output_visuals_path>
+Usage: docopt.py --input_train_file_path=<input_file_path> --input_test_file_path=<input__test_file_path>  --output_visuals_path=<output_visuals_path>
 
 Options:
---input_file_path=<input_file_path>     String: path to input data file
---output_visual_path=<output_visuals_path>      String: path to write model diagnostic plots out to and present results. 
+--input_train_file_path=<input_train_file_path>     String: path to input training data file
+--input_test_file_path=<input__test_file_path>     String: path to input test data file
+--output_visuals_path=<output_visuals_path>      String: path to folder where script will write model diagnostic plots and present results. 
 """
 
-from math import remainder
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.core.numeric import cross
 import pandas as pd
 import random
 
-# data
-from sklearn.compose import ColumnTransformer
+
+from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.base import ClassifierMixin
+
 
 # other
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
     plot_roc_curve,
+    plot_confusion_matrix,
+    classification_report,
 )
 from sklearn.model_selection import RandomizedSearchCV, cross_val_score, cross_validate
+from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.preprocessing import (
     OneHotEncoder,
@@ -36,7 +42,6 @@ from sklearn.preprocessing import (
     PolynomialFeatures,
 )
 from sklearn.impute import SimpleImputer
-from sklearn.svm import SVC, SVR
 
 # For sampling distributions
 import scipy.stats
@@ -74,9 +79,14 @@ def get_data(file_path: str) -> pd.DataFrame:
     return data
 
 
-def run_modelling(training_set: pd.DataFrame, visuals_path: str) -> None:
-    """Runs random forest classifier, support vector classifier and logistic regression classifier over the
-    Earthquake training data set
+def run_modelling(
+    training_set: pd.DataFrame, test_set: pd.DataFrame, visuals_path: str
+) -> None:
+    """Runs RandomForestClassifier and compares against a baseline of DummyClassifier on the
+    Earthquake training data set.
+
+    Creates ROC curve visual for both classifiers, feature importance from the Random Forest Classifier,
+    and Confusion Matrix for both classifiers.
 
     Parameters
     ----------
@@ -95,6 +105,152 @@ def run_modelling(training_set: pd.DataFrame, visuals_path: str) -> None:
         training_set.loc[:, "target"],
     )
 
+    X_test, y_test = (
+        test_set.drop(columns=["target"]),
+        test_set.loc[:, "target"],
+    )
+
+    # Build baseline pipeline
+    dummy_pipe = build_pipeline(DummyClassifier(), param_dists={})
+    dummy_pipe.fit(X_train, y_train)
+
+    # Pipeline tuning settings--------------------------
+    # Classifer will be used within Randomized search
+    base_classifier = RandomForestClassifier()
+
+    # Settings specific to classifier chosen.
+    param_dists = {
+        "max_depth": scipy.stats.randint(10, 100),
+        "min_samples_split": scipy.stats.randint(2, 25),
+    }
+
+    cv = 5
+    scoring = "f1"
+    n_iter_final = 50
+
+    main_pipe = build_pipeline(
+        base_classifier=base_classifier,
+        param_dists=param_dists,
+        cv=cv,
+        scoring=scoring,
+        n_iter_final=n_iter_final,
+    )
+
+    main_pipe.fit(X_train, y_train)
+
+    # Summary Scores
+    final_f1_score = f1_score(y_test, main_pipe.predict(X_test))
+    dummy_score = f1_score(y_test, dummy_pipe.predict(X_test))
+
+    # Summary table ---------------------------------------------
+    # TODO: This could be done better, in a function maybe
+    summary_df = pd.DataFrame(
+        data=[np.round(final_f1_score, 3), np.round(dummy_score, 3)],
+        index=[str(base_classifier), "DummyClassifier()"],
+        columns=["F1 Score"],
+    )
+
+    # Write out matplotlib table
+    fig, ax = plt.subplots(figsize=(3, 2))
+    fig.patch.set_visible(False)
+    ax.axis("off")
+    ax.axis("tight")
+
+    ax.table(
+        cellText=summary_df.values,
+        colLabels=summary_df.columns,
+        rowLabels=summary_df.index,
+        colWidths=[0.25],
+        loc="center",
+    )
+    fig.savefig(
+        os.path.join(visuals_path, "classifier_results_table.png"),
+        bbox_inches="tight",
+    )
+
+    # Build out plots to save----------------------------------------------------------
+    classifier_type = str(base_classifier).split("(")[0]
+
+    #  ROC Plots for real classifier, and benchmark Dummy
+    build_roc_plot(
+        main_pipe,
+        classifier_name=classifier_type,
+        X=X_test,
+        y=y_test,
+        visuals_path=visuals_path,
+    )
+
+    # For DummyClassifier
+    build_roc_plot(dummy_pipe, "DummyClassifier", X_test, y_test, visuals_path)
+
+    # Feature Importance----------------------------------------------------------------
+    feat_list = get_column_names_from_ColumnTransformer(
+        main_pipe.named_steps["preprocess"]
+    )
+    feat_imps = main_pipe.named_steps["clf"].best_estimator_.feature_importances_
+
+    feat_imp_df = pd.DataFrame(
+        index=feat_list, data=feat_imps, columns=["Feature Importance %"]
+    ).sort_values(by="Feature Importance %")
+
+    fig, ax = plt.subplots()
+    ax.barh(
+        feat_imp_df.index,
+        feat_imp_df["Feature Importance %"],
+    )
+    ax.set_title(f"Feature Importance for {classifier_type}")
+    ax.set_xlabel("% Importance")
+    fig.savefig(
+        os.path.join(visuals_path, "feature_importance.png"),
+        bbox_inches="tight",
+    )
+
+    # Confusion Matrix for real classifier, and benchmark Dummy--------------
+    build_confusion_matrix_plot(
+        main_pipe,
+        classifier_name=classifier_type,
+        X=X_test,
+        y=y_test,
+        visuals_path=visuals_path,
+    )
+
+    build_confusion_matrix_plot(
+        dummy_pipe, "DummyClassifier", X_test, y_test, visuals_path
+    )
+
+    return main_pipe
+
+
+def build_pipeline(
+    base_classifier: ClassifierMixin,
+    param_dists: dict,
+    cv: int = 5,
+    scoring: str = "f1",
+    n_iter_final: int = 10,
+) -> Pipeline:
+    """
+    Build a pipeline for the Earthquake dataset with four demographic features.
+    Creates preprocessing, and then RandomizedSearchCV over the param dists passed in for the classifier.
+
+    Parameters
+    ----------
+    base_classifier: sklearn.base.Classifier
+        a sklearn classifier object
+    param_dists: dict
+        param distributions compatible with the classifier passed in to be used in RandomizedSearchCV
+    cv: int
+        number of cv folds to be used in RandomizedSearchCV step
+    scoring: string
+        scoring to use in RandomizedSearchCV
+    n_iter_final: int
+        number of iterations to use in RandomizedSearchCV
+
+
+    Returns
+    -------
+    Pipeline:
+        a sklearn pipeline ready to be fit
+    """
     # For our dataset, just the two types of variables are used.
     ordinal = ["age", "household_income"]
     categorical = ["us_region", "gender"]
@@ -121,79 +277,117 @@ def run_modelling(training_set: pd.DataFrame, visuals_path: str) -> None:
         remainder="drop",
     )
 
-    # TODO: MOVE THIS TO A FUNCTION! Take in classifier, param_grid
-    # Pipeline tuning settings--------------------------
-    # Classifer will be used within RFECV, and Randomized search
-    base_classifier = RandomForestClassifier()
-
-    # Settings specific to classifier chosen.
-    param_dists = {
-        "max_depth": scipy.stats.randint(10, 100),
-        "min_samples_split": scipy.stats.randint(2, 25),
-    }
-
-    cv = 2
-    scoring = "f1"
-
-    # Number of iterations when doing feature search
-    n_feature_search = 2
-    # Number of iterations when doing final model tuning on feature set
-    n_iter_final = 10
-
-    # This pipeline will run the preprocessing, then do feature selection with RandomizedSearchCV
-    # within each set of features. Finally it uses that feature set in a longer search of hyperparameters
+    # This pipeline will run the preprocessing and
+    # uses RandomizedSearchCV search of hyperparameters
     # on the specified classifier
-    main_pipe = Pipeline(
-        steps=[
-            ("preprocess", preprocessor),
-            (
-                "clf",
-                RandomizedSearchCV(
-                    estimator=base_classifier,
-                    param_distributions=param_dists,
-                    cv=cv,
-                    scoring=scoring,
-                    refit=scoring,
-                    n_iter=n_iter_final,
+    #
+    # If DummyClassifier passed in, don't do any tuning
+    if str(base_classifier).split("(")[0] == "DummyClassifier":
+        main_pipe = Pipeline(
+            steps=[
+                ("preprocess", preprocessor),
+                (
+                    "clf",
+                    base_classifier,
                 ),
-            ),
-        ]
-    )
-
-    main_pipe.fit(X_train, y_train)
-
-    feat_list = get_column_names_from_ColumnTransformer(preprocessor)
-
-    # Summary Scores
-    cv_f1_score = cross_val_score(main_pipe, X_train, y_train, scoring=scoring, cv=cv)
-    print(f"Final F1 CV Score: {np.mean(cv_f1_score):.3f}")
-
-    # Build out plots to save----------------------------------------------------------
-
-    # Classification performance
-    fig, ax = plt.subplots()
-    plot_roc_curve(main_pipe, X_train, y_train, ax=ax)
-    ax.set_title("Receiver Operating Characteristic Curve on Best Model")
-    fig.savefig(os.path.join(visuals_path, "roc_auc_curve.png"), bbox_inches="tight")
-
-    # Feature selection steps
-    grid_scores = feature_select.grid_scores_
-    fig, ax = plt.subplots()
-    ax.plot(np.arange(1, len(grid_scores) + 1), grid_scores)
-    ax.set_xlabel("Features In Model")
-    ax.set_ylabel("F1 Score")
-    ax.xaxis.set_tick_params(rotation=45)
-    ax.set_title("F1 Score with Recursive Feature Selection Process")
-    fig.savefig(
-        os.path.join(visuals_path, "feature_selection.png"), bbox_inches="tight"
-    )
+            ]
+        )
+    else:
+        main_pipe = Pipeline(
+            steps=[
+                ("preprocess", preprocessor),
+                (
+                    "clf",
+                    RandomizedSearchCV(
+                        estimator=base_classifier,
+                        param_distributions=param_dists,
+                        cv=cv,
+                        scoring=scoring,
+                        refit=scoring,
+                        n_iter=n_iter_final,
+                        verbose=1,
+                        n_jobs=-2,
+                    ),
+                ),
+            ]
+        )
 
     return main_pipe
 
 
+def build_roc_plot(
+    classifier: ClassifierMixin,
+    classifier_name: str,
+    X: pd.DataFrame,
+    y: pd.DataFrame,
+    visuals_path: str,
+) -> None:
+    """Build a Receiver Operating Characteristic Plot for classifier and dataset.
+    Save plot out to specified folder
+
+    Parameters
+    ----------
+    classifier : ClassifierMixin
+        A fitted sklearn Classifier
+    classifier_name : str
+        name to use on plot for Classifier
+    X : pd.DataFrame
+        compatible input dataset with Classifier
+    y : pd.DataFrame
+        target column for Classifier
+    visuals_path: str
+        path to save plot to.
+    """
+    fig, ax = plt.subplots()
+    plot_roc_curve(classifier, X, y, ax=ax)
+    ax.set_title(f"Receiver Operating Characteristic Curve on {classifier_name}")
+    fig.savefig(
+        os.path.join(visuals_path, f"roc_auc_curve_{classifier_name}.png"),
+        bbox_inches="tight",
+    )
+
+
+def build_confusion_matrix_plot(
+    classifier: ClassifierMixin,
+    classifier_name: str,
+    X: pd.DataFrame,
+    y: pd.DataFrame,
+    visuals_path: str,
+) -> None:
+    """Build a Confusion Matrix for classifier and dataset.
+    Save plot out to specified folder
+
+    Parameters
+    ----------
+    classifier : ClassifierMixin
+        A fitted sklearn Classifier
+    classifier_name : str
+        name to use on plot for Classifier
+    X : pd.DataFrame
+        compatible input dataset with Classifier
+    y : pd.DataFrame
+        target column for Classifier
+    visuals_path: str
+        path to save plot to.
+    """
+    fig, ax = plt.subplots()
+    ax.grid(False)
+    plot_confusion_matrix(classifier, X, y, ax=ax)
+    ax.set_title(f"Confusion Matrix on {classifier_name}")
+    fig.savefig(
+        os.path.join(visuals_path, f"confusion_matrix_{classifier_name}.png"),
+        bbox_inches="tight",
+    )
+
+
 if __name__ == "__main__":
-    # opt = docopt(__doc__)
-    # training_data = get_data(opt["--input_file_path"])
-    # os.chdir("..")
-    training_set = get_data("data/processed/earthquake_data_train.csv")
-    best_model = run_modelling(training_set=training_set, visuals_path="visuals")
+    opt = docopt(__doc__)
+
+    training_set = get_data(opt["--input_train_file_path"])
+    test_set = get_data(opt["--input_test_file_path"])
+
+    best_model = run_modelling(
+        training_set=training_set,
+        test_set=test_set,
+        visuals_path=opt["--output_visuals_path"],
+    )
