@@ -1,0 +1,5 @@
+name: seismophobia
+channels:
+  - conda-forge
+  - defaults
+prefix: C:\Users\Drumm\miniconda3\envs\seismophobia

@@ -16,14 +16,18 @@ All contributors must abide by our [code of conduct](https://github.com/UBC-MDS/
 
 We have endeavored to isolate all the requirements for this project in the Dockerfile. If possible, use this as your first choice. Otherwise, you can configure a conda environment for this repo. From the root of the repo run:
 
-    $ conda env create -f conda_env.yml
+    $ conda env create -f seismophobia_conda_env.yml
 
-To configure your R environment to work with our analysis, first install the `renv` package in your Rstudio terminal. After this is installed, create a project R environment using `renv::restore`
+
+For the R scripts, we have export all session info to `R_session_info.txt` in the root of the folder. This can be used to check if any R package versions fail.
+
+<!-- TODO: Use Renv from command line for Rscripts? -->
+<!-- To configure your R environment to work with our analysis, first install the `renv` package in your Rstudio terminal. After this is installed, create a project R environment using `renv::restore`
 
 ``` {.r}
 > install.packages('renv')
 > renv::restore()
-```
+``` -->
 
 TODO: Dockerfile example
 
