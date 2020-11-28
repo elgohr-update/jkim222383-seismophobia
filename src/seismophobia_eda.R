@@ -21,12 +21,13 @@ main <- function(in_dir, out_dir) {
   # Read in data
   earthquake <- read.csv(in_dir)
   
-  # Remove survey questions
+  # Remove survey questions, change age 60 to 60+
   earthquake <- earthquake %>% 
     select(-think_lifetime_big_one, -experience_earthquake, 
            -prepared_earthquake, -familliar_san_andreas,
            -familiar_yellowstone) %>% 
     mutate(labeled_target = ifelse(target == 1, "worried", "not worried")) %>% 
+    mutate(age = ifelse(age == "60", "60+", age)) %>% 
     mutate_if(is.character,as.factor)
   
   # Change order of income variables to be numeric
