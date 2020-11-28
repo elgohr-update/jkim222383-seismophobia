@@ -9,3 +9,6 @@ Rscript src/pre_process_seismophobia.R --input_path=data/raw/earthquake_data.csv
 
 # Build eda visuals 
 Rscript src/seismophobia_eda.R --data_path=data/processed/train.csv --out_dir=visuals
+
+# Run the modelling
+python src/build_model.py --input_train_file_path="data/processed/train.csv" --input_test_file_path="data/processed/test.csv" --output_visuals_path="visuals"
