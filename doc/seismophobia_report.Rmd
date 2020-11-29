@@ -99,7 +99,7 @@ knitr::include_graphics(here::here("visuals", "feature_importance.png"))
 
 Our model does not seem to be very effective in identifying people who are afraid of earthquakes. A different type of model, such as logistic regression may yield better results, as well as dealing with the class imbalance. The greatest potential for improvement lies in obtaining a more comprehensive data set that contains more demographic features and a larger sample size.
 
-The R [@R] and Python [@van1995python] programming languages and the following Python packages were used for this project: pandas [@reback2020pandas], sklearn [@scikit-learn], tidyverse [@tidyverse], knitr [@knitr] and docopt [XXXXXXXXXX@docopt]. The code used to perform the analysis and create this report can be found at: https://github.com/UBC-MDS/seismophobia
+The R [@R] and Python [@van1995python] programming languages and the following Python packages were used for this project: pandas [@reback2020pandas], sklearn [@scikit-learn], tidyverse [@tidyverse], and knitr [@knitr]. The code used to perform the analysis and create this report can be found at: https://github.com/UBC-MDS/seismophobia
 
 
 
