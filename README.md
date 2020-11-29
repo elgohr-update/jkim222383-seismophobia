@@ -21,3 +21,12 @@ Configure a conda environment for this repo. From the root of the repo run:
 
 
 For the R scripts, we have exported all session info to `R_session_info.txt` in the root of the folder. This can be used to check if any R package versions fail.
+
+## Script for analysis
+
+The following shell script will run all the scripts required to reproduce our analysis from top to bottom, without need to specify any additional argument. 
+From the root of the repo, run:
+
+```bash
+bash run_analysis.sh
+```
