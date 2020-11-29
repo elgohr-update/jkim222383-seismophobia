@@ -66,7 +66,7 @@ demographic features and earthquake fear.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/feature_distributions.png" alt="Fig 1: Distribution of demographic information among survey respondents" width="75%" />
+<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/feature_distributions.png" alt="Fig 1: Distribution of demographic information among survey respondents" width="75%" />
 <p class="caption">
 Fig 1: Distribution of demographic information among survey respondents
 </p>
@@ -81,26 +81,26 @@ US regions was not uniform, possibly due to the fact that the list of
 regions is divided into geographic regions that don’t necessarily have
 the same populations. For example, the Pacific region (Washington,
 Oregon, and California) has a population of 50.1 million compared to New
-England (Connecticut, Massachussets, Maine, New Hampshire, Rhode Island,
+England (Connecticut, Massachusetts, Maine, New Hampshire, Rhode Island,
 and Vermont) has a combined population of 14.7 million (Bureau 2019).
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/feature_distributions_across_response.png" alt="Fig 2: The level of earthquake fear across demograhic features" width="75%" />
+<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/feature_distributions_across_response.png" alt="Fig 2: The level of earthquake fear across demograhic features" width="75%" />
 <p class="caption">
 Fig 2: The level of earthquake fear across demograhic features
 </p>
 
 </div>
 
-Younger people tend to report being be more afraid than older people,
+Younger people tend to report being afraid more often than older people,
 while women report being afraid more often than men. The geographic
 region with the highest level of fear is the Pacific. Overall there were
 more people who were not afraid of earthquakes than were afraid.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/target_distribution.png" alt="Fig 3: The distribution of earthquake fear among respondents" width="25%" />
+<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/target_distribution.png" alt="Fig 3: The distribution of earthquake fear among respondents" width="25%" />
 <p class="caption">
 Fig 3: The distribution of earthquake fear among respondents
 </p>
@@ -110,15 +110,17 @@ Fig 3: The distribution of earthquake fear among respondents
 Analysis
 --------
 
-We used a random forest classifier and for the prediction, which in
-addition to predicting gives a measure of importance for each feature.
-We chose to use only the demographic variables as model features because
-they are available in census data without having to conduct another
-survey. The prediction target is the self-reported fear of earthquakes,
-which we converted from an ordinal variable to a binary variable called
-`target`. The class `target` = 0 includes the levels *“not at all
-worried”* and *“not so worried”*, while `target` = 1 includes *“somewhat
-worried”*, *“very worried”*, and *“extremely worried”*.
+We used a random forest classifier for the prediction task. In addition
+to binary classification for prediction, random forest classifier gives
+a measure of importance for each feature. We chose to use only the
+demographic variables as model features because they are readily
+available in census data without having to conduct a separate, more
+task-specific survey. The prediction target is the self-reported fear of
+earthquakes, which we converted from an ordinal variable to a binary
+variable called `target`. The class `target` = 0 includes the levels
+*“not at all worried”* and *“not so worried”*, while `target` = 1
+includes *“somewhat worried”*, *“very worried”*, and *“extremely
+worried”*.
 
 Results
 -------
@@ -132,7 +134,7 @@ earthquakes) than the dummy classifier and had more false negatives.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/confusion_matrix_DummyClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" /><img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/confusion_matrix_RandomForestClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" />
+<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/confusion_matrix_DummyClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" /><img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/confusion_matrix_RandomForestClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" />
 <p class="caption">
 Fig 4: Confusion matrix for dummy classifier and random forest
 classifier
@@ -140,12 +142,12 @@ classifier
 
 </div>
 
-The combined effects of higher precision and lower recall resulted in
-almost identical F1 scores for our model and the dummy classifier.
+The combined effects of higher precision and lower recall resulted in a
+slightly higher F1 scores for our model than the dummy classifier.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/classifier_results_table.png" alt="Fig 5: Classifier F1 scores" width="30%" height="30%" />
+<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/classifier_results_table.png" alt="Fig 5: Classifier F1 scores" width="30%" height="30%" />
 <p class="caption">
 Fig 5: Classifier F1 scores
 </p>
@@ -159,7 +161,7 @@ not a by lot.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/roc_auc_curve_DummyClassifier.png" alt="Fig 6: ROC curves for dummy classifier and random forest classifier" width="50%" height="50%" /><img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/roc_auc_curve_RandomForestClassifier.png" alt="Fig 6: ROC curves for dummy classifier and random forest classifier" width="50%" height="50%" />
+<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/roc_auc_curve_DummyClassifier.png" alt="Fig 6: ROC curves for dummy classifier and random forest classifier" width="50%" height="50%" /><img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/roc_auc_curve_RandomForestClassifier.png" alt="Fig 6: ROC curves for dummy classifier and random forest classifier" width="50%" height="50%" />
 <p class="caption">
 Fig 6: ROC curves for dummy classifier and random forest classifier
 </p>
@@ -173,7 +175,7 @@ be discussed more next week)
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/feature_importance.png" alt="Fig 7: Feature importance in random forest classifier" width="80%" height="80%" />
+<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/feature_importance.png" alt="Fig 7: Feature importance in random forest classifier" width="80%" height="80%" />
 <p class="caption">
 Fig 7: Feature importance in random forest classifier
 </p>
@@ -190,10 +192,8 @@ a larger sample size.
 The R (R Core Team 2019) and Python (Van Rossum and Drake Jr 1995)
 programming languages and the following Python packages were used for
 this project: pandas (team 2020), sklearn (Pedregosa et al. 2011),
-tidyverse (Wickham 2017), knitr (Xie 2014) and docopt
-\[<a href="mailto:XXXXXXXXXX@docopt" class="email">XXXXXXXXXX@docopt</a>\].
-The code used to perform the analysis and create this report can be
-found at:
+tidyverse (Wickham 2017), and knitr (Xie 2014). The code used to perform
+the analysis and create this report can be found at:
 <a href="https://github.com/UBC-MDS/seismophobia" class="uri">https://github.com/UBC-MDS/seismophobia</a>
 
 References
