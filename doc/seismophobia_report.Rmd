@@ -50,7 +50,7 @@ knitr::include_graphics(here::here("visuals", "feature_distributions.png"))
 The survey respondents were fairly evenly split across ages categories and genders. The household income distribution was not uniform, but is likely a reflection of the US population's income distribution, that had a median value of $55,775 in 2015 [@bureau_2018].  The distribution across US regions was not uniform, possibly due to the fact that the list of regions is divided into geographic regions that don't necessarily have the same populations. For example, the Pacific region (Washington, Oregon, and California) has a population of 50.1 million compared to New England (Connecticut, Massachussets, Maine, New Hampshire, Rhode Island, and Vermont) has a combined population of 14.7 million [@bureau_2019].
 
 ```{r feature_distributions_across_response, fig.align = 'center', out.width = "75%", fig.cap = "Fig 2: The level of earthquake fear across demograhic features"}
-knitr::include_graphics(here::here("visuals", "feature_distributions_accross_response.png"))
+knitr::include_graphics(here::here("visuals", "feature_distributions_across_response.png"))
 ```
 Younger people tend to report being be more afraid than older people, while women report being afraid more often than men. The geographic region with the highest level of fear is the Pacific. Overall there were more people who were not afraid of earthquakes than were afraid.
 
