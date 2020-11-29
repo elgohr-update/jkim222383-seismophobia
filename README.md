@@ -13,16 +13,11 @@ We'll be working with the San Andreas Earthquake data set from [`fivethirtyeight
 
 We aim to determine a model for predicting a person's fear of earthquakes, given demographic features about that person. We will investigate a binary classifier, that can predict if a person has fear about earthquakes (seismophobia) given their prior experience with earthquakes and demographic attributes.
 
-## Plan
+## Environment Setup
 
-We will evaluate classifier performance using cross validation and pick the classifier that has the lowest cross validation error. Algorithms we will consider include logistic regression, random forest, and naive Bayes. The objective is to build a binary classifier that can predict a person's fear of earthquakes. We will evaluate the final classifier with the F1 score and area under the receiver operating characteristic curve.
+Configure a conda environment for this repo. From the root of the repo run:
 
-## Exploratory Data Analysis Plan
+    $ conda env create -f seismophobia_conda_env.yml
 
-We will evaluate the raw data first for missing values, and determine if an imputation scheme is appropriate. Next we will look at linear correlations of the respective features in a correlation heat map. We will also look at a histogram of the target class distribution to get an approximate idea of the frequency of different responses.
 
-EDA document can be found here: [EDA Notebook](src/seismophobia_eda.md)
-
-## Communication of Results
-
-We will wrap our analysis in a reproducible code document that can download the data locally, produce the EDA report and then produce a final report of classifier tuning and performance. We will also discuss next steps we might take if we were to ask a slightly different question or use more data. The report will have a summary table of classifier performance, in addition to plots that show classifier performance. We will create a `Makefile` and `Dockerfile` capable of recreating our analysis on an end user's machine.
+For the R scripts, we have exported all session info to `R_session_info.txt` in the root of the folder. This can be used to check if any R package versions fail.

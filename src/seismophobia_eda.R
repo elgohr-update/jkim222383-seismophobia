@@ -15,6 +15,7 @@ suppressMessages(library(here))
 suppressMessages(library(ggthemes))
 suppressMessages(library(testthat))
 
+
 opt <- docopt(doc)
 
 main <- function(in_dir, out_dir) {

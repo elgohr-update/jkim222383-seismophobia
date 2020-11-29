@@ -12,3 +12,6 @@ Rscript src/seismophobia_eda.R --data_path=data/processed/train.csv --out_dir=vi
 
 # Run the modelling
 python src/build_model.py --input_train_file_path="data/processed/train.csv" --input_test_file_path="data/processed/test.csv" --output_visuals_path="visuals"
+
+# Write the report
+Rscript -e "rmarkdown::render('doc/seismophobia_report.Rmd', output_format='github_document')"
