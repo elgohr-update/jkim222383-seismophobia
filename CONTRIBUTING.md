@@ -14,22 +14,19 @@ All contributors must abide by our [code of conduct](https://github.com/UBC-MDS/
 
 ## Environment Setup
 
-Configure a conda environment for this repo. From the root of the repo run:
+After cloning this GitHub repository, install the required conda dependencies by configuring a conda environment for this repo. From the root of the repo run:
 
-    $ conda env create -f seismophobia_conda_env.yml
+```
+$ conda env create -f seismophobia_conda_env.yml
+```
 
+For the R scripts, open the Rstudio seismophobia.Rproj file in Rstudio. From the console run:
 
-For the R scripts, we have exported all session info to `R_session_info.txt` in the root of the folder. This can be used to check if any R package versions fail.
+```
+renv::restore()
+```
 
-<!-- TODO: Use Renv from command line for Rscripts? -->
-<!-- To configure your R environment to work with our analysis, first install the `renv` package in your Rstudio terminal. After this is installed, create a project R environment using `renv::restore`
-
-``` {.r}
-> install.packages('renv')
-> renv::restore()
-``` -->
-
-TODO: Dockerfile example
+All R package versions can be found in `renv.lock`.
 
 ### Workflow for Pull Requests
 
