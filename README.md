@@ -17,7 +17,7 @@ We aim to determine a model for predicting a person's fear of earthquakes, given
 
 ## Report
 
-The final report can be found [here](https://htmlpreview.github.io/UBC-MDS/seismophobia/blob/main/doc/seismophobia_report.html). 
+The final report can be found [here](https://htmlpreview.github.io/?https://github.com/UBC-MDS/seismophobia/blob/main/doc/seismophobia_report.html). 
 
 ## Environment Setup
 
