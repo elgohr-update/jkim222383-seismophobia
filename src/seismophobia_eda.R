@@ -10,7 +10,7 @@ Options:
 " -> doc
 
 suppressMessages(library(tidyverse))
-uppressMessages(library(docopt))
+suppressMessages(library(docopt))
 suppressMessages(library(here))
 suppressMessages(library(ggthemes))
 suppressMessages(library(testthat))
