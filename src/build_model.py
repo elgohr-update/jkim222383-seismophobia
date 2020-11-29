@@ -111,7 +111,7 @@ def run_modelling(
     )
 
     # Build baseline pipeline
-    dummy_pipe = build_pipeline(DummyClassifier(), param_dists={})
+    dummy_pipe = build_pipeline(DummyClassifier(strategy='stratified'), param_dists={})
     dummy_pipe.fit(X_train, y_train)
 
     # Pipeline tuning settings--------------------------
