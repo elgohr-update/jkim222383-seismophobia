@@ -14,6 +14,7 @@ library(docopt)
 library(here)
 library(testthat)
 library(ggthemes)
+library(testthat)
 
 opt <- docopt(doc)
 
@@ -25,12 +26,13 @@ main <- function(in_dir, out_dir) {
   # Read in data
   earthquake <- read.csv(in_dir)
   
-  # Remove survey questions
+  # Remove survey questions, change age 60 to 60+
   earthquake <- earthquake %>% 
     select(-think_lifetime_big_one, -experience_earthquake, 
            -prepared_earthquake, -familliar_san_andreas,
            -familiar_yellowstone) %>% 
     mutate(labeled_target = ifelse(target == 1, "worried", "not worried")) %>% 
+    mutate(age = ifelse(age == "60", "60+", age)) %>% 
     mutate_if(is.character,as.factor)
   
   # Change order of income variables to be numeric
@@ -46,7 +48,11 @@ main <- function(in_dir, out_dir) {
   earthquake %>% 
     ggplot() +
     aes(x = labeled_target) +
-    geom_histogram(stat = "count", color = "blue", fill = "blue") +
+    geom_bar(stat = "count", 
+             color = "blue", 
+             fill = "blue",
+             width = 0.4,
+             alpha = 0.6) +
     scale_fill_tableau() +
     scale_colour_tableau() +
     labs(x = "Survey Response",
@@ -106,6 +112,13 @@ main <- function(in_dir, out_dir) {
   ggsave(paste0(out_dir, "/feature_distributions_across_response.png"), 
          width = 10, 
          height = 10)
+  
+  # Add tests checking that images were created
+  test_that("Test for making sure the plots were properly saved.", {
+    expect_that(paste0(out_dir, "/target_distribution.png"), file.exists, label = 'Plot 1 not created!')
+    expect_that(paste0(out_dir, "/feature_distributions.png"), file.exists, label = 'Plot 2 not created!')
+    expect_that(paste0(out_dir, "/feature_distributions_accross_response.png"), file.exists, label = 'Plot 3 not created!')
+  })
 }
 
 
