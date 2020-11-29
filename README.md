@@ -5,17 +5,19 @@ date: "11/19/2020"
 output: html_document
 ---
 
-## Dataset
+## About
+
+The damage that earthquakes cause can leave people without food, water, and shelter. Being prepared for an earthquake before it happens can make living through the immediate aftermath less traumatic (Paton, Mcclure, and Buergelt (2006)). Having insurance that covers the damage caused by earthquakes may reduce the uncertainty and fear that the threat of earthquakes creates. People who are afraid of earthquakes represent a group of potential clients for companies selling earthquake preparedness products and insurance. It has been demonstrated that people who are more concerned about earthquakes are more likely to have taken preparatory measures, such as owning a preparedness kit (Dooley et al. 1992).
+
+We aim to predict groups in the population that are afraid of earthquakes and thus are target demographics for advertising. If a machine learning algorithm can identify these groups it enables companies to build a marketing strategy based on this information.
 
 We'll be working with the San Andreas Earthquake data set from [`fivethirtyeight`](https://github.com/fivethirtyeight/data/tree/master/san-andreas) which collected people's relative fear of earthquakes along with other demographic attributes such as age, gender, household income and region.
 
-## Purpose
-
-We aim to determine a model for predicting a person's fear of earthquakes, given demographic features about that person. We will investigate a binary classifier, that can predict if a person has fear about earthquakes (seismophobia) given their prior experience with earthquakes and demographic attributes.
+We aim to determine a model for predicting a person's fear of earthquakes, given demographic features about that person. We will investigate a binary classifier that can predict if a person has fear about earthquakes (seismophobia) given their prior experience with earthquakes and demographic attributes.
 
 ## Report
 
-The final report can be found [here](https://github.com/UBC-MDS/seismophobia/blob/main/doc/seismophobia_report.md). 
+The final report can be found [here](https://htmlpreview.github.io/UBC-MDS/seismophobia/blob/main/doc/seismophobia_report.html). 
 
 ## Environment Setup
 
