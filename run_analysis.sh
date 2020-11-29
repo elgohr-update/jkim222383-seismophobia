@@ -15,3 +15,6 @@ python src/build_model.py --input_train_file_path="data/processed/train.csv" --i
 
 # Write the report
 Rscript -e "rmarkdown::render('doc/seismophobia_report.Rmd', output_format='github_document')"
+
+# Write out report so it visualizes nice on Github
+Rscript -e "rmarkdown::render('doc/seismophobia_report.Rmd', output_file='index.html',output_dir='.', output_format='github_document')"
