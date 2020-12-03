@@ -12,15 +12,13 @@ Trevor Kinsey, Dustin Andrews, Dustin Burnham, Junghoo Kim
 -   [Results](#results)
 -   [References](#references)
 
-Summary
--------
+## Summary
 
 We built a random forest classification model that predicts whether
 someone is afraid of earthquakes based on their demographic information.
 The model predicted fear of earthquakes better than a dummy classifier.
 
-Introduction
-------------
+## Introduction
 
 The damage that earthquakes cause can leave people without food, water,
 and shelter. Being prepared for an earthquake before it happens can make
@@ -39,15 +37,13 @@ earthquakes and thus are target demographics for advertising. If a
 machine learning algorithm can identify these groups it enables
 companies to build a marketing strategy based on this information.
 
-Methods
--------
+## Methods
 
-Data
-----
+## Data
 
 The data for this analysis was downloaded from
-<a href="https://github.com/fivethirtyeight/data/tree/master/san-andreas" class="uri">https://github.com/fivethirtyeight/data/tree/master/san-andreas</a>.
-It is based on a survey conducted by
+<https://github.com/fivethirtyeight/data/tree/master/san-andreas>. It is
+based on a survey conducted by
 [fivethirtyeight.com](https://fivethirtyeight.com/) in May 2015, of 1014
 respondents in the US.
 
@@ -66,7 +62,7 @@ demographic features and earthquake fear.
 
 <div class="figure" style="text-align: center">
 
-<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/feature_distributions.png" alt="Fig 1: Distribution of demographic information among survey respondents" width="75%" />
+<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/feature_distributions.png" alt="Fig 1: Distribution of demographic information among survey respondents" width="75%" />
 <p class="caption">
 Fig 1: Distribution of demographic information among survey respondents
 </p>
@@ -86,7 +82,7 @@ and Vermont) has a combined population of 14.7 million (Bureau 2019).
 
 <div class="figure" style="text-align: center">
 
-<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/feature_distributions_across_response.png" alt="Fig 2: The level of earthquake fear across demograhic features" width="75%" />
+<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/feature_distributions_across_response.png" alt="Fig 2: The level of earthquake fear across demograhic features" width="75%" />
 <p class="caption">
 Fig 2: The level of earthquake fear across demograhic features
 </p>
@@ -100,15 +96,14 @@ more people who were not afraid of earthquakes than were afraid.
 
 <div class="figure" style="text-align: center">
 
-<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/target_distribution.png" alt="Fig 3: The distribution of earthquake fear among respondents" width="25%" />
+<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/target_distribution.png" alt="Fig 3: The distribution of earthquake fear among respondents" width="25%" />
 <p class="caption">
 Fig 3: The distribution of earthquake fear among respondents
 </p>
 
 </div>
 
-Analysis
---------
+## Analysis
 
 We used a random forest classifier for the prediction task. In addition
 to binary classification for prediction, random forest classifier gives
@@ -122,8 +117,7 @@ variable called `target`. The class `target` = 0 includes the levels
 includes *“somewhat worried”*, *“very worried”*, and *“extremely
 worried”*.
 
-Results
--------
+## Results
 
 Our model was a random forest classifier which we compared to a dummy
 classifier that assigned a class randomly based on the target
@@ -134,7 +128,7 @@ earthquakes) than the dummy classifier and had more false negatives.
 
 <div class="figure" style="text-align: center">
 
-<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/confusion_matrix_DummyClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" /><img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/confusion_matrix_RandomForestClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" />
+<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/confusion_matrix_DummyClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" /><img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/confusion_matrix_RandomForestClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" />
 <p class="caption">
 Fig 4: Confusion matrix for dummy classifier and random forest
 classifier
@@ -147,7 +141,7 @@ slightly higher F1 scores for our model than the dummy classifier.
 
 <div class="figure" style="text-align: center">
 
-<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/classifier_results_table.png" alt="Fig 5: Classifier F1 scores" width="30%" height="30%" />
+<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/classifier_results_table.png" alt="Fig 5: Classifier F1 scores" width="30%" height="30%" />
 <p class="caption">
 Fig 5: Classifier F1 scores
 </p>
@@ -161,7 +155,7 @@ not a by lot.
 
 <div class="figure" style="text-align: center">
 
-<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/roc_auc_curve_DummyClassifier.png" alt="Fig 6: ROC curves for dummy classifier and random forest classifier" width="50%" height="50%" /><img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/roc_auc_curve_RandomForestClassifier.png" alt="Fig 6: ROC curves for dummy classifier and random forest classifier" width="50%" height="50%" />
+<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/roc_auc_curve_DummyClassifier.png" alt="Fig 6: ROC curves for dummy classifier and random forest classifier" width="50%" height="50%" /><img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/roc_auc_curve_RandomForestClassifier.png" alt="Fig 6: ROC curves for dummy classifier and random forest classifier" width="50%" height="50%" />
 <p class="caption">
 Fig 6: ROC curves for dummy classifier and random forest classifier
 </p>
@@ -175,7 +169,7 @@ be discussed more next week)
 
 <div class="figure" style="text-align: center">
 
-<img src="/home/ananta/mds/block3/dsci-522/seismophobia/visuals/feature_importance.png" alt="Fig 7: Feature importance in random forest classifier" width="80%" height="80%" />
+<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/feature_importance.png" alt="Fig 7: Feature importance in random forest classifier" width="80%" height="80%" />
 <p class="caption">
 Fig 7: Feature importance in random forest classifier
 </p>
@@ -194,14 +188,13 @@ programming languages and the following Python packages were used for
 this project: pandas (team 2020), sklearn (Pedregosa et al. 2011),
 tidyverse (Wickham 2017), and knitr (Xie 2014). The code used to perform
 the analysis and create this report can be found at:
-<a href="https://github.com/UBC-MDS/seismophobia" class="uri">https://github.com/UBC-MDS/seismophobia</a>
+<https://github.com/UBC-MDS/seismophobia>
 
-References
-----------
+## References
 
-<div id="refs" class="references hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-<div id="ref-bureau_2018">
+<div id="ref-bureau_2018" class="csl-entry">
 
 Bureau, US Census. 2018. “Income and Poverty in the United States:
 2015.” *The United States Census Bureau*.
@@ -209,7 +202,7 @@ Bureau, US Census. 2018. “Income and Poverty in the United States:
 
 </div>
 
-<div id="ref-bureau_2019">
+<div id="ref-bureau_2019" class="csl-entry">
 
 ———. 2019. “State Population Totals: 2010-2019.” *The United States
 Census Bureau*.
@@ -217,16 +210,17 @@ Census Bureau*.
 
 </div>
 
-<div id="ref-doi.org/10.1111/j.1559-1816.1992.tb00984.x">
+<div id="ref-doi.org/10.1111/j.1559-1816.1992.tb00984.x"
+class="csl-entry">
 
 Dooley, David, Ralph Catalano, Shiraz Mishra, and Seth Serxner. 1992.
 “Earthquake Preparedness: Predictors in a Community Survey1.” *Journal
 of Applied Social Psychology* 22 (6): 451–70.
-<https://doi.org/https://doi.org/10.1111/j.1559-1816.1992.tb00984.x>.
+https://doi.org/<https://doi.org/10.1111/j.1559-1816.1992.tb00984.x>.
 
 </div>
 
-<div id="ref-72124acf2fa84e8aad36e68d0dc4c5e6">
+<div id="ref-72124acf2fa84e8aad36e68d0dc4c5e6" class="csl-entry">
 
 Paton, D, J Mcclure, and Petra Buergelt. 2006. “Natural Hazard
 Resilience: The Role of Individual and Household Preparedness.” In
@@ -235,7 +229,7 @@ and David Johnston, 105–27. Charles C Thomas Publisher, Ltd.
 
 </div>
 
-<div id="ref-scikit-learn">
+<div id="ref-scikit-learn" class="csl-entry">
 
 Pedregosa, F., G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O.
 Grisel, M. Blondel, et al. 2011. “Scikit-Learn: Machine Learning in
@@ -243,7 +237,7 @@ Python.” *Journal of Machine Learning Research* 12: 2825–30.
 
 </div>
 
-<div id="ref-R">
+<div id="ref-R" class="csl-entry">
 
 R Core Team. 2019. *R: A Language and Environment for Statistical
 Computing*. Vienna, Austria: R Foundation for Statistical Computing.
@@ -251,28 +245,28 @@ Computing*. Vienna, Austria: R Foundation for Statistical Computing.
 
 </div>
 
-<div id="ref-reback2020pandas">
+<div id="ref-reback2020pandas" class="csl-entry">
 
 team, The pandas development. 2020. *Pandas-Dev/Pandas: Pandas* (version
 latest). Zenodo. <https://doi.org/10.5281/zenodo.3509134>.
 
 </div>
 
-<div id="ref-van1995python">
+<div id="ref-van1995python" class="csl-entry">
 
 Van Rossum, Guido, and Fred L Drake Jr. 1995. *Python Tutorial*. Centrum
 voor Wiskunde en Informatica Amsterdam, The Netherlands.
 
 </div>
 
-<div id="ref-tidyverse">
+<div id="ref-tidyverse" class="csl-entry">
 
 Wickham, Hadley. 2017. *Tidyverse: Easily Install and Load the
 ’Tidyverse’*. <https://CRAN.R-project.org/package=tidyverse>.
 
 </div>
 
-<div id="ref-knitr">
+<div id="ref-knitr" class="csl-entry">
 
 Xie, Yihui. 2014. “Knitr: A Comprehensive Tool for Reproducible Research
 in R.” In *Implementing Reproducible Computational Research*, edited by
