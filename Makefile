@@ -31,5 +31,6 @@ clean :
 	rm -f data/raw/earthquake.csv
 	rm -f data/processed/*
 	rm -f visuals/*
+	rm -f doc/seismophobia_report.md doc/seismophobia_report.html
 
 
