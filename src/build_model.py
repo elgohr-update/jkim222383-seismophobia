@@ -46,6 +46,9 @@ from sklearn.impute import SimpleImputer
 # For sampling distributions
 import scipy.stats
 
+# For Shapley Addtive Explanations (SHAP)
+import shap
+
 # Documentation
 from docopt import docopt
 import typing
@@ -138,14 +141,21 @@ def run_modelling(
 
     main_pipe.fit(X_train, y_train)
 
+    # Dictionary to match different pipes and models
+    model_dict = {
+        "DummyClassifier" : dummy_pipe,
+        base_classifier : main_pipe
+    }
+
     # Summary Scores
-    final_f1_score = f1_score(y_test, main_pipe.predict(X_test))
-    dummy_score = f1_score(y_test, dummy_pipe.predict(X_test))
+    summary_score = {}
+    for model in model_dict.keys():
+        summary_score[model] = f1_score(y_test, model_dict[model].predict(X_test))
 
     # Summary table ---------------------------------------------
     # TODO: This could be done better, in a function maybe
     summary_df = pd.DataFrame(
-        data=[np.round(final_f1_score, 3), np.round(dummy_score, 3)],
+        data=[np.round(summary_score[base_classifier], 3), np.round(summary_score["DummyClassifier"], 3)],
         index=[str(base_classifier), "DummyClassifier()"],
         columns=["F1 Score"],
     )
@@ -172,16 +182,14 @@ def run_modelling(
     classifier_type = str(base_classifier).split("(")[0]
 
     #  ROC Plots for real classifier, and benchmark Dummy
-    build_roc_plot(
-        main_pipe,
-        classifier_name=classifier_type,
-        X=X_test,
-        y=y_test,
-        visuals_path=visuals_path,
-    )
-
-    # For DummyClassifier
-    build_roc_plot(dummy_pipe, "DummyClassifier", X_test, y_test, visuals_path)
+    for model in model_dict.keys():
+        build_roc_plot(
+            main_pipe,
+            classifier_name=str(model).split("(")[0],
+            X=X_test,
+            y=y_test,
+            visuals_path=visuals_path,
+        )
 
     # Feature Importance----------------------------------------------------------------
     feat_list = get_column_names_from_ColumnTransformer(
@@ -206,17 +214,14 @@ def run_modelling(
     )
 
     # Confusion Matrix for real classifier, and benchmark Dummy--------------
-    build_confusion_matrix_plot(
-        main_pipe,
-        classifier_name=classifier_type,
-        X=X_test,
-        y=y_test,
-        visuals_path=visuals_path,
-    )
-
-    build_confusion_matrix_plot(
-        dummy_pipe, "DummyClassifier", X_test, y_test, visuals_path
-    )
+    for model in model_dict.keys():
+        build_confusion_matrix_plot(
+            main_pipe,
+            classifier_name=str(model).split("(")[0],
+            X=X_test,
+            y=y_test,
+            visuals_path=visuals_path,
+        )
 
     return main_pipe
 
@@ -379,6 +384,41 @@ def build_confusion_matrix_plot(
         bbox_inches="tight",
     )
 
+
+def build_shap_plot(
+    classifier: ClassifierMixin,
+    classifier_name: str,
+    X: pd.DataFrame,
+    y: pd.DataFrame,
+    visuals_path: str,
+) -> None:
+    """Build a Shapley Additive Explanations (SHAP) Summary Plot for classifier and dataset.
+    Save plot out to specified folder
+
+    Parameters
+    ----------
+    classifier : ClassifierMixin
+        A fitted sklearn Classifier
+    classifier_name : str
+        name to use on plot for Classifier
+    X : pd.DataFrame
+        compatible input dataset with Classifier
+    y : pd.DataFrame
+        target column for Classifier
+    visuals_path: str
+        path to save plot to.
+    """
+
+    explainer = shap.TreeExplainer(pipe_rf.named_steps["randomforestclassifier"])
+
+    fig, ax = plt.subplots()
+
+    plot_roc_curve(classifier, X, y, ax=ax)
+    ax.set_title(f"SHAP Summary Plot on {classifier_name}")
+    fig.savefig(
+        os.path.join(visuals_path, f"shap_summary_plot_{classifier_name}.png"),
+        bbox_inches="tight",
+    )
 
 if __name__ == "__main__":
     opt = docopt(__doc__)
