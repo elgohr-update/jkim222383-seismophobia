@@ -222,6 +222,16 @@ def run_modelling(
             y=y_test,
             visuals_path=visuals_path,
         )
+        if model == "DummyClassifier":
+            continue
+        build_shap_plot(
+            model_dict[model],
+            classifier_name=str(model).split("(")[0],
+            X=X_train,
+            y=y_train,
+            visuals_path=visuals_path,
+        )
+    
 
     return main_pipe
 
@@ -403,17 +413,42 @@ def build_shap_plot(
         name to use on plot for Classifier
     X : pd.DataFrame
         compatible input dataset with Classifier
-    y : pd.DataFrame
-        target column for Classifier
     visuals_path: str
         path to save plot to.
     """
 
-    explainer = shap.TreeExplainer(pipe_rf.named_steps["randomforestclassifier"])
+    #TODO: add more descriptive comments and abstract away some objects into arguments or global constants
+
+    explainer = shap.TreeExplainer(classifier.named_steps['clf'].best_estimator_)
+
+    preprocessor = classifier.named_steps['preprocess']
+
+    ohe_feature_names = (
+        preprocessor.named_transformers_["categorical"]
+        .named_steps["one_hot"]
+        .get_feature_names()
+        .tolist()
+    )
+
+    ordinal = ["age", "household_income"]
+
+    feature_names = (
+        ohe_feature_names + ordinal
+    )
+
+    X_enc = pd.DataFrame(
+        data=preprocessor.transform(X),
+        columns=feature_names,
+        index=X.index,
+    )
 
     fig, ax = plt.subplots()
 
-    plot_roc_curve(classifier, X, y, ax=ax)
+    shap_values = np.array(explainer.shap_values(X_enc))
+
+    shap.summary_plot(
+        shap_values[-1], X_enc
+    )
     ax.set_title(f"SHAP Summary Plot on {classifier_name}")
     fig.savefig(
         os.path.join(visuals_path, f"shap_summary_plot_{classifier_name}.png"),
