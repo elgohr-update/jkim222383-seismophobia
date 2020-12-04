@@ -21,6 +21,7 @@ import random
 
 
 from sklearn.dummy import DummyClassifier
+from sklearn.linear_model import LogisticRegressionCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.base import ClassifierMixin
 
@@ -115,57 +116,85 @@ def run_modelling(
         test_set.loc[:, "target"],
     )
 
-    # List of classifiers and model to iterate over
-    clf_names = ["DummyClassifier", "RandomForestClassifier"]
-    clf_list = [DummyClassifier(strategy = 'stratified'), RandomForestClassifier()]
+    # build preprocessor to be used by all models
+    ordinal = ["age", "household_income"]
+    categorical = ["us_region", "gender"]
+
+    ordinal_pipe = make_pipeline(SimpleImputer(strategy="most_frequent"), OrdinalEncoder())
+    categorical_pipe = make_pipeline(SimpleImputer(strategy="most_frequent"), OneHotEncoder())
+    
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("categorical", categorical_pipe, categorical),
+            ("ordinal", ordinal_pipe, ordinal),
+        ],
+        remainder="drop",
+    )
+
+    # List of the classifiers to be used
+    classifiers = [
+        DummyClassifier(strategy='stratified'),
+        LogisticRegressionCV(),
+        RandomForestClassifier(),
+    ]
 
     # Pipeline tuning settings--------------------------
     # Classifers 1 and 2 will be used within Randomized search
     param_dists = {}
     # Empty param_dist for dummy classifier
     param_dists[0] = {}
-    # Settings specific to classifier 1
+    # Param dists for classifier 1
     param_dists[1] = {
         "max_depth": scipy.stats.randint(10, 100),
         "min_samples_split": scipy.stats.randint(2, 25),
     }
+    # TODO: Edit if tuning hparams for classifier 2
+    # Param dists for classifier 2
+    param_dists[2] = {}
 
     # Settings for RandomizedSearchCV
     cv = 5
     scoring = "f1"
     n_iter_final = 50
 
+    # List of classifier names for quick reference
+    clf_names = []
     # List of pipelines to iterate over
     pipe_list = []
+    # Dictionary of classifiers
+    model_dict = {} 
     # Build pipelines
-    for i in range(len(clf_names)):
+    for i in range(len(classifiers)):
+        classifier_name = str(classifiers[i]).split("(")[0]
+        clf_names.append(classifier_name)
         pipe = build_pipeline(
-            base_classifier=clf_list[i],
+            base_classifier=classifiers[i],
             classifier_name=clf_names[i],
             param_dists=param_dists[i],
+            preprocessor=preprocessor,
             cv=cv,
             scoring=scoring,
             n_iter_final=n_iter_final
         )
-        pipe.fit(X_train, y_train)
         pipe_list.append(pipe)
-
-    # Dictionary to match different models and pipes
-    model_dict = {clf_names[i] : pipe_list[i] for i in range(len(clf_names))}
-
+        model_dict[classifier_name] = pipe
+        
     # Summary Scores
     summary_score = {}
     for clf in model_dict.keys():
+        model_dict[clf].fit(X_train, y_train)
         summary_score[clf] = f1_score(y_test, model_dict[clf].predict(X_test))
 
     # Summary table ---------------------------------------------
     # TODO: This could be done better, in a function maybe
     summary_df = pd.DataFrame(
-        data=[np.round(summary_score[clf_names[1]], 3), np.round(summary_score[clf_names[0]], 3)],
-        index=[clf_names[1], clf_names[0]],
+        data=[np.round(summary_score["LogisticRegressionCV"], 3), 
+                        np.round(summary_score["RandomForestClassifier"], 3), 
+                        np.round(summary_score["DummyClassifier"], 3)],
+        index=["LogisticRegression", "RandomForest", "DummyClassifier"],
         columns=["F1 Score"],
     )
-    base_classifier = clf_list[1]
+    base_classifier = classifiers[1]
 
     # Write out matplotlib table
     fig, ax = plt.subplots(figsize=(3, 2))
@@ -185,49 +214,30 @@ def run_modelling(
         bbox_inches="tight",
     )
 
-    # Build out plots to save----------------------------------------------------------
-    classifier_type = str(clf_names[1])
+    # List of the classifiers to be used
+    classifiers = [
+        DummyClassifier(strategy='stratified'),
+        LogisticRegressionCV(),
+        RandomForestClassifier(),
+    ]
 
-    #  ROC Plots for real classifier, and benchmark Dummy
-    for i in range(len(model_dict.keys())):
+
+
+    # Build out plots to save----------------------------------------------------------
+    # classifier_type = str(base_classifier).split("(")[0]
+
+    #  ROC Plots and Confusion matrixfor all models
+    for model in model_dict.keys():
         build_roc_plot(
-            pipe_list[i],
-            classifier_name=clf_names[i],
+            model_dict[model],
+            classifier_name=str(model),
             X=X_test,
             y=y_test,
             visuals_path=visuals_path,
         )
-
-    # Feature Importance----------------------------------------------------------------
-    # Feature Importance is only possible for Random Forest
-    rf_pipe = pipe_list[1]
-
-    feat_list = get_column_names_from_ColumnTransformer(
-        rf_pipe.named_steps["preprocess"]
-    )
-    feat_imps = rf_pipe.named_steps["clf"].best_estimator_.feature_importances_
-
-    feat_imp_df = pd.DataFrame(
-        index=feat_list, data=feat_imps, columns=["Feature Importance %"]
-    ).sort_values(by="Feature Importance %")
-
-    fig, ax = plt.subplots()
-    ax.barh(
-        feat_imp_df.index,
-        feat_imp_df["Feature Importance %"],
-    )
-    ax.set_title(f"Feature Importance for {classifier_type}")
-    ax.set_xlabel("% Importance")
-    fig.savefig(
-        os.path.join(visuals_path, "feature_importance.png"),
-        bbox_inches="tight",
-    )
-
-    for i in range(len(clf_names)):
-        # Confusion Matrix for real classifier, and benchmark Dummy--------------
         build_confusion_matrix_plot(
-            pipe_list[i],
-            classifier_name=clf_names[i],
+            model_dict[model],
+            classifier_name=str(model),
             X=X_test,
             y=y_test,
             visuals_path=visuals_path,
@@ -242,21 +252,23 @@ def run_modelling(
             visuals_path=visuals_path,
         )
 
-    # TODO: decide whether to return the best performing model. Right now, returns the Random Forest pipeline 
-    return clf[1]
+    return 
+
+
 
 
 def build_pipeline(
     base_classifier: ClassifierMixin,
     classifier_name : str,
     param_dists: dict,
+    preprocessor, #sklearn.compose._column_transformer.ColumnTransformer,
     cv: int = 5,
     scoring: str = "f1",
     n_iter_final: int = 10,
 ) -> Pipeline:
     """
-    Build a pipeline for the Earthquake dataset with four demographic features.
-    Creates preprocessing, and then RandomizedSearchCV over the param dists passed in for the classifier.
+    Builds a pipeline with tuned hyperparameters for a given classifier and a ColumnTransformer
+    using RandomizedSearchCV over the param dists passed in for the classifier.
 
     Parameters
     ----------
@@ -266,6 +278,8 @@ def build_pipeline(
         name of classifier
     param_dists: dict
         param distributions compatible with the classifier passed in to be used in RandomizedSearchCV
+    preprocessor: sklearn.compose._column_transformer.ColumnTransformer
+        an sklearn columntransformer object to be include in the pipeline
     cv: int
         number of cv folds to be used in RandomizedSearchCV step
     scoring: string
@@ -279,68 +293,31 @@ def build_pipeline(
     Pipeline:
         a sklearn pipeline ready to be fit
     """
-    # For our dataset, just the two types of variables are used.
-    ordinal = ["age", "household_income"]
-    categorical = ["us_region", "gender"]
-
-    ordinal_pipe = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="most_frequent")),
-            ("ordinal_encode", OrdinalEncoder()),
-        ]
-    )
-
-    categorical_pipe = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="most_frequent")),
-            ("one_hot", OneHotEncoder()),
-        ]
-    )
-
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ("categorical", categorical_pipe, categorical),
-            ("ordinal", ordinal_pipe, ordinal),
-        ],
-        remainder="drop",
-    )
-
+    
     # This pipeline will run the preprocessing and
     # uses RandomizedSearchCV search of hyperparameters
     # on the specified classifier
-    #
-    # If DummyClassifier passed in, don't do any tuning
-    if classifier_name == "DummyClassifier":
-        main_pipe = Pipeline(
-            steps=[
-                ("preprocess", preprocessor),
-                (
-                    "clf",
-                    base_classifier,
-                ),
-            ]
-        )
+        
+    # If DummyClassifier or LogisticRegression is passed in, don't do any tuning
+    if str(base_classifier).split("(")[0] != "RandomForestClassifier":
+        main_pipe = make_pipeline(preprocessor, base_classifier)
     else:
-        main_pipe = Pipeline(
-            steps=[
-                ("preprocess", preprocessor),
-                (
-                    "clf",
-                    RandomizedSearchCV(
-                        estimator=base_classifier,
-                        param_distributions=param_dists,
-                        cv=cv,
-                        scoring=scoring,
-                        refit=scoring,
-                        n_iter=n_iter_final,
-                        verbose=1,
-                        n_jobs=-2,
-                    ),
-                ),
-            ]
+        main_pipe = make_pipeline(
+            preprocessor,
+            RandomizedSearchCV(
+                estimator=base_classifier,
+                param_distributions=param_dists,
+                cv=cv,
+                scoring=scoring,
+                refit=scoring,
+                n_iter=n_iter_final,
+                verbose=1,
+                n_jobs=-2,
+            )
         )
-
+       
     return main_pipe
+
 
 
 def build_roc_plot(
@@ -431,23 +408,13 @@ def build_shap_plot(
     """
 
     #TODO: add more descriptive comments and abstract away some objects into arguments or global constants
+    explainer = shap.TreeExplainer(classifier.named_steps['randomizedsearchcv'].best_estimator_)
 
-    explainer = shap.TreeExplainer(classifier.named_steps['clf'].best_estimator_)
+    preprocessor = classifier.named_steps['columntransformer']
 
-    preprocessor = classifier.named_steps['preprocess']
+    preprocessor.fit(X, y)
 
-    ohe_feature_names = (
-        preprocessor.named_transformers_["categorical"]
-        .named_steps["one_hot"]
-        .get_feature_names()
-        .tolist()
-    )
-
-    ordinal = ["age", "household_income"]
-
-    feature_names = (
-        ohe_feature_names + ordinal
-    )
+    feature_names = get_column_names_from_ColumnTransformer(preprocessor)
 
     X_enc = pd.DataFrame(
         data=preprocessor.transform(X),
@@ -467,6 +434,7 @@ def build_shap_plot(
         os.path.join(visuals_path, f"shap_summary_plot_{classifier_name}.png"),
         bbox_inches="tight",
     )
+
 
 if __name__ == "__main__":
     opt = docopt(__doc__)
