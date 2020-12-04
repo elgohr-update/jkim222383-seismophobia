@@ -85,19 +85,21 @@ def get_data(file_path: str) -> pd.DataFrame:
 def run_modelling(
     training_set: pd.DataFrame, test_set: pd.DataFrame, visuals_path: str
 ) -> None:
-    """Runs RandomForestClassifier and compares against a baseline of DummyClassifier on the
+    """Runs classifier 1 (RandomForestClassifier) and classifier 2 (LogisticRegression) and compares against a baseline of DummyClassifier on the
     Earthquake training data set.
 
-    Creates ROC curve visual for both classifiers, feature importance from the Random Forest Classifier,
-    and Confusion Matrix for both classifiers.
+    Creates ROC curve visual for all classifiers, Confusion Matrix for all classifiers and SHAP summary plots for both classifiers 1 & 2.
 
     Parameters
     ----------
     training_set: (pd.DataFrame):
         training set split of Earthquake data, used with cross validation to determine best model
+    test_set : (pd.DataFrame):
+        test set split of Earthquake data, used to evaluate the final model
     visuals_path (str):
         file path to write visuals out to
 
+    # TODO: Specify return type (Pipeline for best performing model)
     """
     # For reproducibility set seed
     random.seed(42)
@@ -113,52 +115,57 @@ def run_modelling(
         test_set.loc[:, "target"],
     )
 
-    # Build baseline pipeline
-    dummy_pipe = build_pipeline(DummyClassifier(strategy='stratified'), param_dists={})
-    dummy_pipe.fit(X_train, y_train)
+    # List of classifiers and model to iterate over
+    clf_names = ["DummyClassifier", "RandomForestClassifier"]
+    clf_list = [DummyClassifier(strategy = 'stratified'), RandomForestClassifier()]
 
     # Pipeline tuning settings--------------------------
-    # Classifer will be used within Randomized search
-    base_classifier = RandomForestClassifier()
-
-    # Settings specific to classifier chosen.
-    param_dists = {
+    # Classifers 1 and 2 will be used within Randomized search
+    param_dists = {}
+    # Empty param_dist for dummy classifier
+    param_dists[0] = {}
+    # Settings specific to classifier 1
+    param_dists[1] = {
         "max_depth": scipy.stats.randint(10, 100),
         "min_samples_split": scipy.stats.randint(2, 25),
     }
 
+    # Settings for RandomizedSearchCV
     cv = 5
     scoring = "f1"
     n_iter_final = 50
 
-    main_pipe = build_pipeline(
-        base_classifier=base_classifier,
-        param_dists=param_dists,
-        cv=cv,
-        scoring=scoring,
-        n_iter_final=n_iter_final,
-    )
+    # List of pipelines to iterate over
+    pipe_list = []
+    # Build pipelines
+    for i in range(len(clf_names)):
+        pipe = build_pipeline(
+            base_classifier=clf_list[i],
+            classifier_name=clf_names[i],
+            param_dists=param_dists[i],
+            cv=cv,
+            scoring=scoring,
+            n_iter_final=n_iter_final
+        )
+        pipe.fit(X_train, y_train)
+        pipe_list.append(pipe)
 
-    main_pipe.fit(X_train, y_train)
-
-    # Dictionary to match different pipes and models
-    model_dict = {
-        "DummyClassifier" : dummy_pipe,
-        base_classifier : main_pipe
-    }
+    # Dictionary to match different models and pipes
+    model_dict = {clf_names[i] : pipe_list[i] for i in range(len(clf_names))}
 
     # Summary Scores
     summary_score = {}
-    for model in model_dict.keys():
-        summary_score[model] = f1_score(y_test, model_dict[model].predict(X_test))
+    for clf in model_dict.keys():
+        summary_score[clf] = f1_score(y_test, model_dict[clf].predict(X_test))
 
     # Summary table ---------------------------------------------
     # TODO: This could be done better, in a function maybe
     summary_df = pd.DataFrame(
-        data=[np.round(summary_score[base_classifier], 3), np.round(summary_score["DummyClassifier"], 3)],
-        index=[str(base_classifier), "DummyClassifier()"],
+        data=[np.round(summary_score[clf_names[1]], 3), np.round(summary_score[clf_names[0]], 3)],
+        index=[clf_names[1], clf_names[0]],
         columns=["F1 Score"],
     )
+    base_classifier = clf_list[1]
 
     # Write out matplotlib table
     fig, ax = plt.subplots(figsize=(3, 2))
@@ -179,23 +186,26 @@ def run_modelling(
     )
 
     # Build out plots to save----------------------------------------------------------
-    classifier_type = str(base_classifier).split("(")[0]
+    classifier_type = str(clf_names[1])
 
     #  ROC Plots for real classifier, and benchmark Dummy
-    for model in model_dict.keys():
+    for i in range(len(model_dict.keys())):
         build_roc_plot(
-            main_pipe,
-            classifier_name=str(model).split("(")[0],
+            pipe_list[i],
+            classifier_name=clf_names[i],
             X=X_test,
             y=y_test,
             visuals_path=visuals_path,
         )
 
     # Feature Importance----------------------------------------------------------------
+    # Feature Importance is only possible for Random Forest
+    rf_pipe = pipe_list[1]
+
     feat_list = get_column_names_from_ColumnTransformer(
-        main_pipe.named_steps["preprocess"]
+        rf_pipe.named_steps["preprocess"]
     )
-    feat_imps = main_pipe.named_steps["clf"].best_estimator_.feature_importances_
+    feat_imps = rf_pipe.named_steps["clf"].best_estimator_.feature_importances_
 
     feat_imp_df = pd.DataFrame(
         index=feat_list, data=feat_imps, columns=["Feature Importance %"]
@@ -213,31 +223,32 @@ def run_modelling(
         bbox_inches="tight",
     )
 
-    # Confusion Matrix for real classifier, and benchmark Dummy--------------
-    for model in model_dict.keys():
+    for i in range(len(clf_names)):
+        # Confusion Matrix for real classifier, and benchmark Dummy--------------
         build_confusion_matrix_plot(
-            main_pipe,
-            classifier_name=str(model).split("(")[0],
+            pipe_list[i],
+            classifier_name=clf_names[i],
             X=X_test,
             y=y_test,
             visuals_path=visuals_path,
         )
-        if model == "DummyClassifier":
+        if clf_names[i] == "DummyClassifier":
             continue
         build_shap_plot(
-            model_dict[model],
-            classifier_name=str(model).split("(")[0],
+            pipe_list[i],
+            classifier_name=clf_names[i],
             X=X_train,
             y=y_train,
             visuals_path=visuals_path,
         )
-    
 
-    return main_pipe
+    # TODO: decide whether to return the best performing model. Right now, returns the Random Forest pipeline 
+    return clf[1]
 
 
 def build_pipeline(
     base_classifier: ClassifierMixin,
+    classifier_name : str,
     param_dists: dict,
     cv: int = 5,
     scoring: str = "f1",
@@ -251,6 +262,8 @@ def build_pipeline(
     ----------
     base_classifier: sklearn.base.Classifier
         a sklearn classifier object
+    classifier_name : str
+        name of classifier
     param_dists: dict
         param distributions compatible with the classifier passed in to be used in RandomizedSearchCV
     cv: int
@@ -297,7 +310,7 @@ def build_pipeline(
     # on the specified classifier
     #
     # If DummyClassifier passed in, don't do any tuning
-    if str(base_classifier).split("(")[0] == "DummyClassifier":
+    if classifier_name == "DummyClassifier":
         main_pipe = Pipeline(
             steps=[
                 ("preprocess", preprocessor),
