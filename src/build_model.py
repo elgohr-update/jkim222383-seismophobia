@@ -118,20 +118,9 @@ def run_modelling(
     ordinal = ["age", "household_income"]
     categorical = ["us_region", "gender"]
 
-    ordinal_pipe = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="most_frequent")),
-            ("ordinal_encode", OrdinalEncoder()),
-        ]
-    )
-
-    categorical_pipe = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="most_frequent")),
-            ("one_hot", OneHotEncoder()),
-        ]
-    )
-
+    ordinal_pipe = make_pipeline(SimpleImputer(strategy="most_frequent"), OrdinalEncoder())
+    categorical_pipe = make_pipeline(SimpleImputer(strategy="most_frequent"), OneHotEncoder())
+    
     preprocessor = ColumnTransformer(
         transformers=[
             ("categorical", categorical_pipe, categorical),
@@ -140,7 +129,7 @@ def run_modelling(
         remainder="drop",
     )
 
-    # List of classifiers to be used
+    # List of the classifiers to be used
     classifiers = [
         DummyClassifier(strategy='stratified'),
         LogisticRegressionCV(),
@@ -153,7 +142,9 @@ def run_modelling(
         model_dict[str(classifier).split("(")[0]] = make_pipeline(preprocessor, classifier)
         model_dict[str(classifier).split("(")[0]].fit(X_train, y_train)
         
-    
+    # Tune parameters for RandomForestClassifier.... 
+    # TODO: there is a nicer way to do this!!
+    # Ideally in the above for loop using build_pipeline()
     param_dists = {
         "max_depth": scipy.stats.randint(10, 100),
         "min_samples_split": scipy.stats.randint(2, 25),
@@ -177,11 +168,6 @@ def run_modelling(
                 )
     model_dict["RandomForestClassifier"].fit(X_train, y_train)
 
-
-    # random_pipe = make_pipeline(preprocessor, RandomForestClassifier())
-    # random_pipe.fit(X_train, y_train)
-
- 
 
     # Summary Scores
     summary_score = {}
@@ -237,6 +223,9 @@ def run_modelling(
         )
 
     return 
+
+
+
 
 def build_pipeline(
     base_classifier: ClassifierMixin,
