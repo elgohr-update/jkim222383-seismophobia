@@ -21,6 +21,7 @@ import random
 
 
 from sklearn.dummy import DummyClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.base import ClassifierMixin
 
@@ -113,9 +114,39 @@ def run_modelling(
         test_set.loc[:, "target"],
     )
 
+    # build preprocessor
+    ordinal = ["age", "household_income"]
+    categorical = ["us_region", "gender"]
+
+    ordinal_pipe = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("ordinal_encode", OrdinalEncoder()),
+        ]
+    )
+
+    categorical_pipe = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("one_hot", OneHotEncoder()),
+        ]
+    )
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("categorical", categorical_pipe, categorical),
+            ("ordinal", ordinal_pipe, ordinal),
+        ],
+        remainder="drop",
+    )
+
     # Build baseline pipeline
-    dummy_pipe = build_pipeline(DummyClassifier(strategy='stratified'), param_dists={})
+    dummy_pipe = make_pipeline(DummyClassifier(strategy='stratified'))#, param_dists={})
     dummy_pipe.fit(X_train, y_train)
+
+    # Build LogisticRegression pipeline
+    logistic_pipe = make_pipeline(preprocessor, LogisticRegression())#, param_dists={})
+    logistic_pipe.fit(X_train, y_train)
 
     # Pipeline tuning settings--------------------------
     # Classifer will be used within Randomized search
@@ -131,7 +162,7 @@ def run_modelling(
     scoring = "f1"
     n_iter_final = 50
 
-    main_pipe = build_pipeline(
+    main_pipe = tune_params(
         base_classifier=base_classifier,
         param_dists=param_dists,
         cv=cv,
@@ -144,7 +175,8 @@ def run_modelling(
     # Dictionary to match different pipes and models
     model_dict = {
         "DummyClassifier" : dummy_pipe,
-        base_classifier : main_pipe
+        "LogisticRegression": logistic_pipe,
+        "base_classifier" : main_pipe
     }
 
     # Summary Scores
@@ -155,8 +187,10 @@ def run_modelling(
     # Summary table ---------------------------------------------
     # TODO: This could be done better, in a function maybe
     summary_df = pd.DataFrame(
-        data=[np.round(summary_score[base_classifier], 3), np.round(summary_score["DummyClassifier"], 3)],
-        index=[str(base_classifier), "DummyClassifier()"],
+        data=[np.round(summary_score["LogisticRegression"], 3), 
+                        np.round(summary_score["base_classifier"], 3), 
+                        np.round(summary_score["DummyClassifier"], 3)],
+        index=["LogisticRegression", str(base_classifier), "DummyClassifier()"],
         columns=["F1 Score"],
     )
 
@@ -192,26 +226,27 @@ def run_modelling(
         )
 
     # Feature Importance----------------------------------------------------------------
-    feat_list = get_column_names_from_ColumnTransformer(
-        main_pipe.named_steps["preprocess"]
-    )
-    feat_imps = main_pipe.named_steps["clf"].best_estimator_.feature_importances_
+    # POSSIBLY NO LONGER NEEDED SINCE WE ARE DOING SHAP
+    # feat_list = get_column_names_from_ColumnTransformer(
+    #     main_pipe.named_steps["preprocess"]
+    # )
+    # feat_imps = main_pipe.named_steps["clf"].best_estimator_.feature_importances_
 
-    feat_imp_df = pd.DataFrame(
-        index=feat_list, data=feat_imps, columns=["Feature Importance %"]
-    ).sort_values(by="Feature Importance %")
+    # feat_imp_df = pd.DataFrame(
+    #     index=feat_list, data=feat_imps, columns=["Feature Importance %"]
+    # ).sort_values(by="Feature Importance %")
 
-    fig, ax = plt.subplots()
-    ax.barh(
-        feat_imp_df.index,
-        feat_imp_df["Feature Importance %"],
-    )
-    ax.set_title(f"Feature Importance for {classifier_type}")
-    ax.set_xlabel("% Importance")
-    fig.savefig(
-        os.path.join(visuals_path, "feature_importance.png"),
-        bbox_inches="tight",
-    )
+    # fig, ax = plt.subplots()
+    # ax.barh(
+    #     feat_imp_df.index,
+    #     feat_imp_df["Feature Importance %"],
+    # )
+    # ax.set_title(f"Feature Importance for {classifier_type}")
+    # ax.set_xlabel("% Importance")
+    # fig.savefig(
+    #     os.path.join(visuals_path, "feature_importance.png"),
+    #     bbox_inches="tight",
+    # )
 
     # Confusion Matrix for real classifier, and benchmark Dummy--------------
     for model in model_dict.keys():
@@ -226,7 +261,7 @@ def run_modelling(
     return main_pipe
 
 
-def build_pipeline(
+def tune_params(
     base_classifier: ClassifierMixin,
     param_dists: dict,
     cv: int = 5,
