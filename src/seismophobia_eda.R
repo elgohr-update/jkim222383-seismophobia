@@ -102,7 +102,7 @@ main <- function(in_dir, out_dir) {
          y = "How worried are you about an earthquake?",
          title = "Feature Distributions Across Earthquake Fear") +
     facet_wrap(. ~ feature, scale = "free", ncol = 2) +
-    scale_fill_viridis_c(direction=-1) +
+    scale_fill_viridis_c() +
     theme_bw() +
     theme(strip.text = element_text(size=10),
           axis.text = element_text(size = 8),
