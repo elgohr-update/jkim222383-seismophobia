@@ -72,29 +72,32 @@ Our model was a random forest classifier which we compared to a dummy classifier
 
 ```{r confusion_matrices, echo=FALSE, out.width="40%", out.height="40%", fig.cap="Fig 4: Confusion matrix for dummy classifier and random forest classifier",fig.show='hold',fig.align='center'}
 knitr::include_graphics(c(here::here("visuals", "confusion_matrix_DummyClassifier.png"),
-                          here::here("visuals", "confusion_matrix_RandomForestClassifier.png")))
+                          here::here("visuals", "confusion_matrix_RandomForestClassifier.png"),
+                          here::here("visuals", "confusion_matrix_LogisticRegressionCV.png")))
 ``` 
 
 The combined effects of higher precision and lower recall resulted in a slightly higher F1 scores for our model than the dummy classifier. 
 
-```{r classifier_results_table, echo=FALSE, out.width="30%", out.height="30%", fig.cap="Fig 5: Classifier F1 scores",fig.show='hold',fig.align='center'}
+```{r classifier_results_table, echo=FALSE, out.width="40%", out.height="40%", fig.cap="Fig 5: Classifier F1 scores",fig.show='hold',fig.align='center'}
 knitr::include_graphics(here::here("visuals", "classifier_results_table.png"))
 ``` 
 
 Of the model's positive predictions, a greater proportion were correct than the dummy classifier's, as characterized by our model's higher *ROC AUC*. The model predicted better than if it was guessing at random, but not a by lot.
 
 
-```{r roc_curves, echo=FALSE, out.width="50%", out.height="50%", fig.cap="Fig 6: ROC curves for dummy classifier and random forest classifier",fig.show='hold',fig.align='center'}
+```{r roc_curves, echo=FALSE, out.width="50%", out.height="50%", fig.cap="Fig 6: ROC curves for various models", fig.show='hold',fig.align='center'}
 knitr::include_graphics(c(here::here("visuals", "roc_auc_curve_DummyClassifier.png"),
-                          here::here("visuals", "roc_auc_curve_RandomForestClassifier.png")))
+                          here::here("visuals", "roc_auc_curve_RandomForestClassifier.png"),
+                          here::here("visuals", "roc_auc_curve_LogisticRegressionCV.png")))
 ``` 
 
 The features that were most important in the prediction task were household income, living in the Pacific region, and age. (How much interpretation can we do based on these feature importances? This will be discussed more next week)
 
 
 
-```{r feature importance, echo=FALSE, out.width="80%", out.height="80%", fig.cap="Fig 7: Feature importance in random forest classifier",fig.show='hold',fig.align='center'}
-knitr::include_graphics(here::here("visuals", "feature_importance.png"))
+```{r feature importance, echo=FALSE, out.width="50%", out.height="50%", fig.cap="Fig 7: SHAP plot for random forest and logistic regression classifiers",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c(here::here("visuals", "shap_summary_plot_RandomForestClassifier.png"),
+                          here::here("visuals", "shap_summary_plot_LogisticRegressionCV.png")))
 ``` 
 
 Our model does not seem to be very effective in identifying people who are afraid of earthquakes. A different type of model, such as logistic regression may yield better results, as well as dealing with the class imbalance. The greatest potential for improvement lies in obtaining a more comprehensive data set that contains more demographic features and a larger sample size.

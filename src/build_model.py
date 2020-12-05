@@ -156,14 +156,12 @@ def run_modelling(
 
     # Settings for RandomizedSearchCV
     # TODO: Change later
-    cv = 2
+    cv = 5
     scoring = "f1"
-    n_iter_final = 2
+    n_iter_final = 50
 
     # List of classifier names for quick reference
     clf_names = []
-    # List of pipelines to iterate over
-    pipe_list = []
     # Dictionary of classifiers
     model_dict = {} 
     # Build pipelines
@@ -179,7 +177,6 @@ def run_modelling(
             scoring=scoring,
             n_iter_final=n_iter_final
         )
-        pipe_list.append(pipe)
         model_dict[classifier_name] = pipe
         
     # Summary Scores
@@ -217,40 +214,27 @@ def run_modelling(
         bbox_inches="tight",
     )
 
-    # List of the classifiers to be used
-    classifiers = [
-        DummyClassifier(strategy='stratified'),
-        LogisticRegression(),
-        RandomForestClassifier(),
-    ]
-
-
-
-    # Build out plots to save----------------------------------------------------------
-    # classifier_type = str(base_classifier).split("(")[0]
-
     #  ROC Plots and Confusion matrixfor all models
-    for model in model_dict.keys():
+    for classifier_name in clf_names:
         build_roc_plot(
-            model_dict[model],
-            classifier_name=str(model),
+            model_dict[classifier_name],
+            classifier_name=classifier_name,
             X=X_test,
             y=y_test,
             visuals_path=visuals_path,
         )
         build_confusion_matrix_plot(
-            model_dict[model],
-            classifier_name=str(model),
+            model_dict[classifier_name],
+            classifier_name=classifier_name,
             X=X_test,
             y=y_test,
             visuals_path=visuals_path,
         )
-        print(model_dict)
-        if clf_names[i] == "DummyClassifier":
+        if classifier_name == "DummyClassifier":
             continue
         build_shap_plot(
-            pipe_list[i],
-            classifier_name=clf_names[i],
+            model_dict[classifier_name],
+            classifier_name=classifier_name,
             X=X_train,
             y=y_train,
             visuals_path=visuals_path,
@@ -426,7 +410,6 @@ def build_shap_plot(
         columns=feature_names,
         index=X.index,
     )
-
     if classifier_name == "LogisticRegression":
         # TODO: fix this
         X_enc = shap.sample(X_enc, 20)
@@ -439,7 +422,7 @@ def build_shap_plot(
     shap_values = np.array(explainer.shap_values(X_enc))
 
     shap.summary_plot(
-        shap_values[-1], X_enc
+        shap_values[-1], X_enc, show=False
     )
     ax.set_title(f"SHAP Summary Plot on {classifier_name}")
     fig.savefig(
