@@ -412,7 +412,7 @@ def build_shap_plot(
     )
     if classifier_name == "LogisticRegression":
         # TODO: fix this
-        X_enc = shap.sample(X_enc, 20)
+        X_enc = shap.sample(X_enc, 50)
         explainer = shap.KernelExplainer(classifier.named_steps['randomizedsearchcv'].best_estimator_.predict_proba, data=X_enc)
     else:
         explainer = shap.TreeExplainer(classifier.named_steps['randomizedsearchcv'].best_estimator_)
