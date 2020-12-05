@@ -21,7 +21,7 @@ import random
 
 
 from sklearn.dummy import DummyClassifier
-from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.base import ClassifierMixin
 
@@ -134,8 +134,8 @@ def run_modelling(
     # List of the classifiers to be used
     classifiers = [
         DummyClassifier(strategy='stratified'),
-        LogisticRegressionCV(),
         RandomForestClassifier(),
+        LogisticRegression(max_iter = 3000),
     ]
 
     # Pipeline tuning settings--------------------------
@@ -150,12 +150,15 @@ def run_modelling(
     }
     # TODO: Edit if tuning hparams for classifier 2
     # Param dists for classifier 2
-    param_dists[2] = {}
+    param_dists[2] = {
+        "C": scipy.stats.loguniform(1e-3, 1e3)
+    }
 
     # Settings for RandomizedSearchCV
-    cv = 5
+    # TODO: Change later
+    cv = 2
     scoring = "f1"
-    n_iter_final = 50
+    n_iter_final = 2
 
     # List of classifier names for quick reference
     clf_names = []
@@ -188,9 +191,9 @@ def run_modelling(
     # Summary table ---------------------------------------------
     # TODO: This could be done better, in a function maybe
     summary_df = pd.DataFrame(
-        data=[np.round(summary_score["LogisticRegressionCV"], 3), 
-                        np.round(summary_score["RandomForestClassifier"], 3), 
-                        np.round(summary_score["DummyClassifier"], 3)],
+        data=[np.round(summary_score["LogisticRegression"], 3), 
+        np.round(summary_score["RandomForestClassifier"], 3), 
+        np.round(summary_score["DummyClassifier"], 3)],
         index=["LogisticRegression", "RandomForest", "DummyClassifier"],
         columns=["F1 Score"],
     )
@@ -217,7 +220,7 @@ def run_modelling(
     # List of the classifiers to be used
     classifiers = [
         DummyClassifier(strategy='stratified'),
-        LogisticRegressionCV(),
+        LogisticRegression(),
         RandomForestClassifier(),
     ]
 
@@ -242,6 +245,7 @@ def run_modelling(
             y=y_test,
             visuals_path=visuals_path,
         )
+        print(model_dict)
         if clf_names[i] == "DummyClassifier":
             continue
         build_shap_plot(
@@ -298,8 +302,8 @@ def build_pipeline(
     # uses RandomizedSearchCV search of hyperparameters
     # on the specified classifier
         
-    # If DummyClassifier or LogisticRegression is passed in, don't do any tuning
-    if str(base_classifier).split("(")[0] != "RandomForestClassifier":
+    # If DummyClassifier, don't do any tuning
+    if classifier_name == "DummyClassifier":
         main_pipe = make_pipeline(preprocessor, base_classifier)
     else:
         main_pipe = make_pipeline(
@@ -403,13 +407,14 @@ def build_shap_plot(
         name to use on plot for Classifier
     X : pd.DataFrame
         compatible input dataset with Classifier
+    y : pd.DataFrame
+        target column for Classifier
     visuals_path: str
         path to save plot to.
     """
 
     #TODO: add more descriptive comments and abstract away some objects into arguments or global constants
-    explainer = shap.TreeExplainer(classifier.named_steps['randomizedsearchcv'].best_estimator_)
-
+    
     preprocessor = classifier.named_steps['columntransformer']
 
     preprocessor.fit(X, y)
@@ -421,6 +426,13 @@ def build_shap_plot(
         columns=feature_names,
         index=X.index,
     )
+
+    if classifier_name == "LogisticRegression":
+        # TODO: fix this
+        X_enc = shap.sample(X_enc, 20)
+        explainer = shap.KernelExplainer(classifier.named_steps['randomizedsearchcv'].best_estimator_.predict_proba, data=X_enc)
+    else:
+        explainer = shap.TreeExplainer(classifier.named_steps['randomizedsearchcv'].best_estimator_)
 
     fig, ax = plt.subplots()
 
