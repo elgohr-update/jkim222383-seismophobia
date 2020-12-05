@@ -18,7 +18,7 @@ library(knitr)
 
 ## Summary
 
-We built a random forest classification model that predicts whether someone is afraid of earthquakes based on their demographic information. The model predicted fear of earthquakes better than a dummy classifier.
+We build a random forest classifier and logistic regression model to predict a person's fear of earthquakes based on their demographic information. Both models predicted fear of earthquakes better than a dummy classifier.
 
 ## Introduction
 
@@ -62,12 +62,12 @@ knitr::include_graphics(here::here("visuals", "target_distribution.png"))
 
 ## Analysis
 
-We used a random forest classifier for the prediction task. In addition to binary classification for prediction, random forest classifier gives a measure of importance for each feature. We chose to use only the demographic variables as model features because they are readily available in census data without having to conduct a separate, more task-specific survey. The prediction target is the self-reported fear of earthquakes, which we converted from an ordinal variable to a binary variable called `target`. The class `target` = 0 includes the levels _"not at all worried"_ and _"not so worried"_, while `target` = 1 includes _"somewhat worried"_, _"very worried"_, and _"extremely worried"_.  
+We used a random forest classifier and a logistic regression for the classification task. In addition to binary classification for prediction, random forest classifier and logistic regression give a measure of importance for each feature. We decided to use SHAP values to investigate feature importance after some preliminary exploration of global feature importance. We chose to use only the demographic variables as model features because they are readily available in census data without having to conduct a separate, more task-specific survey. The prediction target is the self-reported fear of earthquakes, which we converted from an ordinal variable to a binary variable called `target`. The class `target` = 0 includes the levels _"not at all worried"_ and _"not so worried"_, while `target` = 1 includes _"somewhat worried"_, _"very worried"_, and _"extremely worried"_.  
 
 
 ## Results
 
-Our model was a random forest classifier which we compared to a dummy classifier that assigned a class randomly based on the target distribution. Our model had correctly predicted more negative outcomes, with fewer false positives than the dummy classifier. However it correctly predicted fewer positive outcomes (people afraid of earthquakes) than the dummy classifier and had more false negatives.
+Our models were a random forest classifier and a logistic regression which we compared to a dummy classifier that assigned a class randomly based on the target distribution. Our models correctly predicted more negative outcomes, with fewer false positives than the dummy classifier. However they both correctly predicted fewer positive outcomes (people afraid of earthquakes) than the dummy classifier and had more false negatives.
 
 
 ```{r confusion_matrices, echo=FALSE, out.width="40%", out.height="40%", fig.cap="Fig 4: Confusion matrix for dummy classifier and random forest classifier",fig.show='hold',fig.align='center'}
@@ -76,13 +76,13 @@ knitr::include_graphics(c(here::here("visuals", "confusion_matrix_DummyClassifie
                           here::here("visuals", "confusion_matrix_LogisticRegression.png")))
 ``` 
 
-The combined effects of higher precision and lower recall resulted in a slightly higher F1 scores for our model than the dummy classifier. 
+The combined effects of higher precision and lower recall resulted in a slightly higher F1 scores for our models than the dummy classifier. 
 
 ```{r classifier_results_table, echo=FALSE, out.width="40%", out.height="40%", fig.cap="Fig 5: Classifier F1 scores",fig.show='hold',fig.align='center'}
 knitr::include_graphics(here::here("visuals", "classifier_results_table.png"))
 ``` 
 
-Of the model's positive predictions, a greater proportion were correct than the dummy classifier's, as characterized by our model's higher *ROC AUC*. The model predicted better than if it was guessing at random, but not a by lot.
+Of the models positive predictions, a greater proportion were correct than the dummy classifier's, as characterized by our models higher *ROC AUC* scores. The models predicted better than if it was guessing at random, but not a by lot.
 
 
 ```{r roc_curves, echo=FALSE, out.width="50%", out.height="50%", fig.cap="Fig 6: ROC curves for various models", fig.show='hold',fig.align='center'}
@@ -91,16 +91,16 @@ knitr::include_graphics(c(here::here("visuals", "roc_auc_curve_DummyClassifier.p
                           here::here("visuals", "roc_auc_curve_LogisticRegression.png")))
 ``` 
 
-The features that were most important in the prediction task were household income, living in the Pacific region, and age. (How much interpretation can we do based on these feature importances? This will be discussed more next week)
-
-
+The features that were most important in the prediction task were household income, living in the Pacific region, and age. Digging into these features a bit more - we can look at the SHAP value trends for each input to determine what is driving predictions.
 
 ```{r feature importance, echo=FALSE, out.width="50%", out.height="50%", fig.cap="Fig 7: SHAP plot for random forest and logistic regression classifiers",fig.show='hold',fig.align='center'}
 knitr::include_graphics(c(here::here("visuals", "shap_summary_plot_RandomForestClassifier.png"),
                           here::here("visuals", "shap_summary_plot_LogisticRegression.png")))
 ``` 
 
-Our model does not seem to be very effective in identifying people who are afraid of earthquakes. A different type of model, such as logistic regression may yield better results, as well as dealing with the class imbalance. The greatest potential for improvement lies in obtaining a more comprehensive data set that contains more demographic features and a larger sample size.
+Looking at the SHAP values for `us_region_Pacific`, we can see the significant increase in prediction when people were located in the Pacific area. Utilizing the two variables for gender, it appears our model predicts women are more likely to be afraid of earthquakes than men.
+
+Our models do not seem to be very effective in identifying people who are afraid of earthquakes. The greatest potential for improvement lies in obtaining a more comprehensive data set that contains more demographic features and a larger sample size.
 
 The R [@R] and Python [@van1995python] programming languages and the following Python packages were used for this project: pandas [@reback2020pandas], sklearn [@scikit-learn], tidyverse [@tidyverse], and knitr [@knitr]. The code used to perform the analysis and create this report can be found at: https://github.com/UBC-MDS/seismophobia
 
