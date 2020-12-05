@@ -20,11 +20,11 @@ visuals/feature_distributions.png visuals/feature_distributions_across_response.
 	Rscript src/seismophobia_eda.R --data_path=data/processed/train.csv --out_dir=visuals
 
 # Run the modelling
-visuals/classifier_results_table.png visuals/confusion_matrix_DummyClassifier.png visuals/confusion_matrix_RandomForestClassifier.png visuals/roc_auc_curve_DummyClassifier.png visuals/roc_auc_curve_RandomForestClassifier.png visuals/feature_importance.png :  data/processed/train.csv data/processed/test.csv src/build_model.py
+visuals/classifier_results_table.png visuals/confusion_matrix_DummyClassifier.png visuals/confusion_matrix_RandomForestClassifier.png visuals/confusion_matrix_LogisticRegression.png  visuals/roc_auc_curve_DummyClassifier.png visuals/roc_auc_curve_RandomForestClassifier.png visuals/roc_auc_curve_LogisticRegression.png visuals/shap_summary_plot_LogisticRegression.png visuals/shap_summary_plot_RandomForestClassifier.png  :  data/processed/train.csv data/processed/test.csv src/build_model.py
 	python src/build_model.py --input_train_file_path="data/processed/train.csv" --input_test_file_path="data/processed/test.csv" --output_visuals_path="visuals"
 
 # Write the report
-doc/seismophobia_report.md doc/seismophobia_report.html : visuals/classifier_results_table.png visuals/confusion_matrix_DummyClassifier.png visuals/confusion_matrix_RandomForestClassifier.png visuals/roc_auc_curve_DummyClassifier.png visuals/roc_auc_curve_RandomForestClassifier.png visuals/feature_importance.png visuals/feature_distributions.png visuals/feature_distributions_across_response.png visuals/target_distribution.png doc/seismophobia_report.Rmd
+doc/seismophobia_report.md doc/seismophobia_report.html : visuals/classifier_results_table.png visuals/confusion_matrix_DummyClassifier.png visuals/confusion_matrix_RandomForestClassifier.png visuals/confusion_matrix_LogisticRegression.png  visuals/roc_auc_curve_DummyClassifier.png visuals/roc_auc_curve_RandomForestClassifier.png visuals/roc_auc_curve_LogisticRegression.png visuals/shap_summary_plot_LogisticRegression.png visuals/shap_summary_plot_RandomForestClassifier.png  visuals/feature_distributions.png visuals/feature_distributions_across_response.png visuals/target_distribution.png doc/seismophobia_report.Rmd
 	Rscript -e "rmarkdown::render('doc/seismophobia_report.Rmd', output_format='github_document')"
 
 clean :
