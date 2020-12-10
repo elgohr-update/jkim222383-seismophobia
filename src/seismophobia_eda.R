@@ -54,25 +54,30 @@ main <- function(in_dir, out_dir) {
 
   # Class Distribution
   earthquake %>% 
+    group_by(labeled_target) %>% 
+    summarise(target_count = paste0("Count: ", n()),
+              target_count_normalized = n() / nrow(earthquake)) %>% 
     ggplot() +
-    aes(x = labeled_target) +
-    geom_bar(stat = "count", 
+    aes(y = labeled_target,
+        x = target_count_normalized,
+        label = target_count) +
+    geom_bar(stat = "identity", 
              color = "blue", 
              fill = "blue",
              width = 0.4,
              alpha = 0.6) +
     scale_fill_tableau() +
     scale_colour_tableau() +
-    labs(x = "Survey Response",
-         y = "Count",
+    geom_text(nudge_x = 0.05) +
+    labs(x = "Proportion",
+         y = "Survey Response",
          title = "Earthquake Worry Response Distribution",
          subtitle="Training Set") +
     theme(legend.title = element_blank(),
-          axis.text.x = element_text(angle = 90)) +
-    coord_flip()
+          text = element_text(size=20))
 
   ggsave(paste0(out_dir, "/target_distribution.png"), 
-         width = 8, 
+         width = 12, 
          height = 10)
   
   # Generate histograms of each feature
@@ -87,38 +92,48 @@ main <- function(in_dir, out_dir) {
          y = "Counts",
          title = "Distributions of Features") +
     theme_bw() +
-    theme(strip.text = element_text(size=10),
-          axis.text = element_text(size = 8),
-          axis.text.x = element_text(angle = 90)) +
+    theme(#strip.text = element_text(size=10),
+          axis.text = element_text(size = 12),
+          axis.text.x = element_text(angle = 90),
+          text = element_text(size=25)) +
     coord_flip()
   
   ggsave(paste0(out_dir, "/feature_distributions.png"), 
-         width = 8, 
+         width = 10, 
          height = 10)
   
   # Distribution of variables in relation to target class
+  num_worried <- sum(earthquake$labeled_target == "worried")
+  num_not_worried <- sum(earthquake$labeled_target == "not worried")
+  
   earthquake %>% 
     select(-worry_earthquake, -target) %>% 
     pivot_longer(!labeled_target, names_to = "feature", values_to = "value") %>% 
-    add_count(labeled_target, feature, value) %>% 
+    group_by(labeled_target, feature, value) %>% 
+    summarise(group_count = n()) %>% 
+    mutate(group_count_normalized = ifelse(labeled_target == "worried", 
+                                           group_count / num_worried,
+                                           group_count / num_not_worried)) %>% 
     ggplot() +
     aes(x = value, 
         y = labeled_target, 
-        fill = n) +
+        fill = group_count) +
     geom_tile(na.rm = TRUE) +
     labs(x = "Features",
          y = "How worried are you about an earthquake?",
-         title = "Feature Distributions Across Earthquake Fear") +
+         title = "Feature Distributions Across Earthquake Fear",
+         fill = "Count") +
     facet_wrap(. ~ feature, scale = "free", ncol = 2) +
-    scale_fill_viridis_c() +
+    scale_fill_distiller(palette = "Purples", direction = 1) +
     theme_bw() +
     theme(strip.text = element_text(size=10),
-          axis.text = element_text(size = 8),
-          axis.text.x = element_text(angle = 90)) +
+          axis.text = element_text(size = 12),
+          axis.text.x = element_text(angle = 90),
+          text = element_text(size=20)) +
     coord_flip()
   
   ggsave(paste0(out_dir, "/feature_distributions_across_response.png"), 
-         width = 10, 
+         width = 12, 
          height = 10)
 }
 
