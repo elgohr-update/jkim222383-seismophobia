@@ -112,13 +112,6 @@ main <- function(in_dir, out_dir) {
   ggsave(paste0(out_dir, "/feature_distributions_across_response.png"), 
          width = 10, 
          height = 10)
-  
-  # Add tests checking that images were created
-  test_that("Test for making sure the plots were properly saved.", {
-    expect_that(paste0(out_dir, "/target_distribution.png"), file.exists, label = 'Plot 1 not created!')
-    expect_that(paste0(out_dir, "/feature_distributions.png"), file.exists, label = 'Plot 2 not created!')
-    expect_that(paste0(out_dir, "/feature_distributions_across_response.png"), file.exists, label = 'Plot 3 not created!')
-  })
 }
 
 
