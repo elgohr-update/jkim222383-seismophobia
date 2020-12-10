@@ -45,7 +45,7 @@ main <- function(input_path, train_ratio, out_dir){
   train_ratio = as.numeric(train_ratio)
   
   # read data
-  earthquake_raw <- read_csv(input_path)
+  earthquake_raw <- read_csv(input_path, col_types = cols())
   
   # clean up column names, convert character columns to factors, and reorder the target factor levels
   earthquake_fct <- earthquake_raw %>%
@@ -77,7 +77,8 @@ main <- function(input_path, train_ratio, out_dir){
   test_data <- earthquake_fct %>% filter(!(row_number() %in% train_index))
   
   try({
-    dir.create(out_dir)
+    if(!dir.exists(out_dir))
+      {dir.create(out_dir)}
   })
   
   write_csv(train_data, file.path(out_dir, 'train.csv', fsep = FILE_SEP))
