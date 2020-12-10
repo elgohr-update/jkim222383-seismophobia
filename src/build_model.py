@@ -431,6 +431,29 @@ def build_shap_plot(
     )
 
 
+def test_visuals_saved(visuals_path : str) -> None:
+    """Tests that the tables, plots are created in specified path
+
+    Parameters
+    ----------
+    visuals_path: str
+        Path to the visuals directory
+
+    Returns
+    -------
+    None
+
+    Raises
+    -------
+    AssertionError : If tests fail
+    """
+    files = ['classifier_results_table.png', 'confusion_matrix_DummyClassifier.png', 'confusion_matrix_LogisticRegression.png',
+             'confusion_matrix_RandomForestClassifier.png', 'roc_auc_curve_DummyClassifier.png', 'roc_auc_curve_LogisticRegression.png',
+             'roc_auc_curve_RandomForestClassifier.png', 'shap_summary_plot_LogisticRegression.png', 'shap_summary_plot_RandomForestClassifier.png']
+    for visual in files:
+        assert os.path.isfile(os.path.join(visuals_path, visual)), "File is not created at the specified path"
+    print("Tests passed: all visuals created!")
+
 if __name__ == "__main__":
     opt = docopt(__doc__)
 
@@ -442,3 +465,6 @@ if __name__ == "__main__":
         test_set=test_set,
         visuals_path=opt["--output_visuals_path"],
     )
+
+    # Test that all visuals are created
+    test_visuals_saved(visuals_path=opt["--output_visuals_path"])
