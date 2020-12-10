@@ -38,7 +38,7 @@ def main(url, filepath):
 
 
 def test():
-    """Retrieves a dataset from URL and saves to the specified filepath
+    """Tests for main() function
 
     Parameters
     ----------
