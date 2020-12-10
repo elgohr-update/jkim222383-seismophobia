@@ -7,6 +7,12 @@ RUN install2.r --error \
     --deps TRUE \
     renv
 
+# Get all project files into directory
+COPY . /home/seismophobia/
+
+# Setup with Renv lockfile
+RUN cd /home/seismophobia && Rscript -e "renv::restore()"
+
 # Get Make for re running analysis with Makefile
 RUN apt-get update && apt-get install make
 
