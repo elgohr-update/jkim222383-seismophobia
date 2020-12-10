@@ -19,11 +19,20 @@ suppressMessages(library(testthat))
 
 # Default value for train_ratio
 DEFAULT_TRAIN_RATIO <- 0.7
-# Platform-depedent file separator (usually '/' or '\')
+# Platform-dependent file separator (usually '/' or '\')
 FILE_SEP <- .Platform$file.sep
 
 opt <- docopt(doc)
 
+#' Cleans, splits, and pre-processes the fear of earthquake data
+#'
+#' @param input_path str path to the data file 
+#' @param train_ratio numeric ratio, 0 to 1 incl, for the rel. size of train split
+#' @param out_dir str path to the output dir
+#'
+#' @return
+#'
+#' @examples main(input_path=data/raw/earthquake.csv, train_ratio=0.7, out_dir=data/processed)
 main <- function(input_path, train_ratio, out_dir){
   set.seed(2020)
   
@@ -36,7 +45,7 @@ main <- function(input_path, train_ratio, out_dir){
   train_ratio = as.numeric(train_ratio)
   
   # read data
-  earthquake_raw <- read_csv(input_path)
+  earthquake_raw <- read_csv(input_path, col_types = cols())
   
   # clean up column names, convert character columns to factors, and reorder the target factor levels
   earthquake_fct <- earthquake_raw %>%
@@ -68,7 +77,8 @@ main <- function(input_path, train_ratio, out_dir){
   test_data <- earthquake_fct %>% filter(!(row_number() %in% train_index))
   
   try({
-    dir.create(out_dir)
+    if(!dir.exists(out_dir))
+      {dir.create(out_dir)}
   })
   
   write_csv(train_data, file.path(out_dir, 'train.csv', fsep = FILE_SEP))
@@ -97,7 +107,9 @@ test_that("Unit test for pre_process_seismophobia.R using default train_ratio ar
               label = 'train split has wrong number of rows')
   expect_equal(nrow(df_test), nrow(df_raw) - nrow(df_train),
               label = 'test split has wrong number of rows')
+  # remove the files created during test
   unlink(c(TRAIN_DATA_PATH, TEST_DATA_PATH))
+  # remove unit test directory if no files remain 
   if (length(list.files(UNIT_TEST_PATH)) == 0) {
     unlink(UNIT_TEST_PATH, recursive = TRUE)
   }
@@ -112,7 +124,9 @@ test_that("Unit test for pre_process_seismophobia.R using train_ratio argument o
               label = 'train split has wrong number of rows')
   expect_equal(nrow(df_test), nrow(df_raw) - nrow(df_train),
               label = 'test split has wrong number of rows')
+  # remove the files created during test
   unlink(c(TRAIN_DATA_PATH, TEST_DATA_PATH))
+  # remove unit test directory if no files remain 
   if (length(list.files(UNIT_TEST_PATH)) == 0) {
     unlink(UNIT_TEST_PATH, recursive = TRUE)
   }
