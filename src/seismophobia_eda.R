@@ -1,8 +1,8 @@
 # Autors: Group 11 (Dustin Burnham, Dustin Andrews, Trevor Kinsey, Junghoo Kim)
 # Date: November 28th, 2020
 
-"Creates EDA plots for the pre-processes training subset of the seismophobia data set (https://github.com/fivethirtyeight/data/tree/master/san-andreas).
-Saves the plots as a pdf and png file.
+"Creates EDA plots for the pre-processed training subset of the seismophobia data set (https://github.com/fivethirtyeight/data/tree/master/san-andreas).
+Saves the plots as png files.
 Usage: src/seismophobia_eda.R --data_path=<data_path> --out_dir=<out_dir>
 Options:
   --data_path=<data_path>     Path (including filename) to training data (csv file)
@@ -18,6 +18,14 @@ suppressMessages(library(testthat))
 
 opt <- docopt(doc)
 
+#' Creates EDA plots and saves as png files in specified directory
+#'
+#' @param in_dir str path to processed data
+#' @param out_dir str path to output visuals directory
+#'
+#' @return
+#'
+#' @examples main(in_dir=data/processed/train.csv --out_dir=visuals)
 main <- function(in_dir, out_dir) {
   
   # Create out_dir if out_dir and any parent directories in the path do not exist
