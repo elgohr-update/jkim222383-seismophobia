@@ -66,7 +66,7 @@ Then, you can re run the analysis from the root of the repo using:
 $ conda activate seismophobia
 $ make clean
 $ make all
-``
+```
 
 ## License
 
