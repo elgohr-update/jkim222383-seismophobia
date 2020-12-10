@@ -21,33 +21,52 @@ The final report can be found [here](https://htmlpreview.github.io/?https://gith
 
 ## Environment Setup
 
-After cloning this GitHub repository, install the required conda dependencies by configuring a conda environment for this repo. From the root of the repo run:
+### Using Docker
+
+After cloning the Github repo - to use the Docker image and run the analysis, first install Docker Desktop. 
+
+To clean out intermediate files and rerun the entire analysis run:
+```bash
+$ bash clean_and_run_analysis_docker.sh
+```
+This will download the data to the `data` folder, process the data and save to `data/processed`, create the EDA visuals to `visuals/`, build the classifiers and write out a final report of the process in the `doc` folder.
+
+Final document is found at: `doc/seismophobia_report.html`.
+
+This shell script is just a wrapper around `docker run` commands to use `make` to clean out the files and re run the analysis pipeline. To do each one separately you can do:
+
+```
+docker run --rm -e PASSWORD="test" -v "/$(pwd)":/home/seismophobia/ dbandrews/seismophobia:latest make -C //home/seismophobia clean
+```
+
+Then re run the analysis using:
+```
+docker run --rm -e PASSWORD="test" -v "/$(pwd)":/home/seismophobia/ dbandrews/seismophobia:latest make -C //home/seismophobia all
+```
+### Using Make, Conda & Renv
+
+Ensure that you have installed GNU Make and it's on your PATH variable.
+
+Clone this GitHub repository, and install the required conda dependencies by configuring a conda environment for this repo. From the root of the repo run:
 
 ```
 $ conda env create -f seismophobia_conda_env.yml
 ```
 
-For the R scripts, open the Rstudio `seismophobia.Rproj` file in Rstudio. From the console run:
+Then for the R scripts, open the Rstudio `seismophobia.Rproj` file in Rstudio. From the console run:
 
 ```r
 > renv::restore()
 ```
 You should have all needed R packages installed into a local library in `seismophobia/renv/` now. All R package versions can be found in `renv.lock` if needed.
 
-## Usage
+Then, you can re run the analysis from the root of the repo using:
 
-After the required environments are set up, the following shell script will run all the scripts required to reproduce our analysis from top to bottom, without need to specify any additional argument. 
-
-From the root of the repo, run:
-
-```bash
-$ conda activate seismophobia
-$ bash run_analysis.sh
 ```
-
-This will download the data to the `data` folder, process the data and save to `data/processed`, create the EDA visuals to `visuals/`, build the classifiers and write out a final report of the process in the `doc` folder.
-
-Final document is found at: `doc/seismophobia_report.html`
+$ conda activate seismophobia
+$ make clean
+$ make all
+``
 
 ## License
 
