@@ -3,15 +3,16 @@
 FROM rocker/tidyverse:4.0.3
 
 # Get R packages set to proper versions.
-RUN install2.r --error \
-    --deps TRUE \
-    renv
+ENV RENV_VERSION 0.12.2
+RUN R -e "install.packages('renv', version='${RENV_VERSION}')"
 
-# Get all project files into directory
-COPY . /home/seismophobia/
+# Setup using Renv
+WORKDIR /home/seismophobia
 
-# Setup with Renv lockfile
-RUN cd /home/seismophobia && Rscript -e "renv::restore()"
+# Copy all renv setup files into container for restoring library.
+COPY renv.lock .Rprofile ./
+COPY renv/settings.dcf renv/activate.R renv/
+RUN Rscript -e 'renv::restore()'
 
 # Get Make for re running analysis with Makefile
 RUN apt-get update && apt-get install make
@@ -25,6 +26,7 @@ RUN apt-get update && apt-get install make
 #  $ docker run --rm -it continuumio/miniconda3:latest /bin/bash
 #  $ docker push continuumio/miniconda3:latest
 #  $ docker push continuumio/miniconda3:4.5.11
+
 
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV PATH /opt/conda/bin:$PATH
@@ -46,8 +48,5 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux
 # Installs packages into base Conda environment
 COPY seismophobia_conda_env.yml* /home/seismophobia/
 RUN conda env update -n base --file /home/seismophobia/seismophobia_conda_env.yml 
-# && conda init bash && 
-# RUN conda activate seismophobia
 
-
-# CMD [ "/bin/bash" ]
+CMD [ "/bin/bash" ]
