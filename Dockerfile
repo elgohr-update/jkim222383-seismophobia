@@ -1,18 +1,7 @@
 ## Group 11 Dockerfile
 # This Dockerfile will install the versions of R,Python and all packages in both that are required for running analysis.
+
 FROM rocker/tidyverse:4.0.3
-
-# Get R packages set to proper versions.
-ENV RENV_VERSION 0.12.2
-RUN R -e "install.packages('renv', version='${RENV_VERSION}')"
-
-# Setup using Renv
-WORKDIR /home/seismophobia
-
-# Copy all renv setup files into container for restoring library.
-COPY renv.lock .Rprofile ./
-COPY renv/settings.dcf renv/activate.R renv/
-RUN Rscript -e 'renv::restore()'
 
 # Get Make for re running analysis with Makefile
 RUN apt-get update && apt-get install make
@@ -48,5 +37,44 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux
 # Installs packages into base Conda environment
 COPY seismophobia_conda_env.yml* /home/seismophobia/
 RUN conda env update -n base --file /home/seismophobia/seismophobia_conda_env.yml 
+
+#----------------------------------Renv Setup -------------------------------------------------------------------------------------
+
+# Setup Constants - we'll use Rstudio's package manager to download binaries to speed things up.
+
+# Manual R package installs. Tidyverse already installed------------------------------------------
+RUN install2.r --error \
+    --deps TRUE \
+    docopt \
+    here \
+    knitr \ 
+    rmarkdown \ 
+    ggthemes \
+    testthat 
+
+# Setup using Renv
+WORKDIR /home/seismophobia
+
+## PREVIOUS ATTEMPT: Copy all renv setup files into container for restoring library.
+# COPY renv.lock .Rprofile ./
+# COPY renv/settings.dcf renv/activate.R renv/
+# # Get R packages set to proper versions.
+# ENV RENV_PATHS_CACHE="/renv/cache"
+# ENV RENV_CONFIG_USE_CACHE=TRUE  
+
+## NEW ATTEMPT: Initialize using renv inside the container, then copy in renv.lock file for building library
+# RUN R -e 'renv::consent(provided=TRUE)'
+# RUN R -e "options(renv.config.cache.symlinks = FALSE)"
+# RUN R -e 'renv::init(bare=TRUE)'
+# COPY renv.lock renv.lock
+# RUN Rscript -e 'renv::restore()'
+# RUN Rscript -e "renv::isolate()"
+
+# COPY renv.lock renv.lock
+# RUN Rscript -e "install.packages('remotes', repos = c(CRAN = Sys.getenv('CRAN_REPO')))"
+# RUN Rscript -e "remotes::install_github('rstudio/renv', ref = Sys.getenv('RENV_VERSION'))"
+# RUN Rscript -e "renv::restore(repos = c(CRAN = Sys.getenv('CRAN_REPO')))"
+
+#
 
 CMD [ "/bin/bash" ]
