@@ -36,12 +36,12 @@ Final document is found at: `doc/seismophobia_report.html`.
 This shell script is just a wrapper around `docker run` commands to use `make` to clean out the files and re run the analysis pipeline. To do each one separately you can do:
 
 ```
-docker run --rm -e PASSWORD="test" -v "/$(pwd)":/home/seismophobia/ dbandrews/seismophobia:latest make directory=/home/seismophobia clean
+$ docker run --rm -e PASSWORD="test" -v "/$(pwd)":/home/seismophobia/ dbandrews/seismophobia:v0.4.0 make directory=/home/seismophobia clean
 ```
 
 Then re run the analysis using:
 ```
-docker run --rm -e PASSWORD="test" -v "/$(pwd)":/home/seismophobia/ dbandrews/seismophobia:latest make directory=/home/seismophobia all
+$ docker run --rm -e PASSWORD="test" -v "/$(pwd)":/home/seismophobia/ dbandrews/seismophobia:v0.4.0 make directory=/home/seismophobia all
 ```
 ### Using Make, Conda & R
 
