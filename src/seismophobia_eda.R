@@ -86,7 +86,7 @@ main <- function(in_dir, out_dir) {
     pivot_longer(!labeled_target, names_to = "feature", values_to = "value") %>% 
     ggplot() +
     aes(x = value) +
-    geom_histogram(bins = 10, stat = "count") +
+    geom_bar(stat = "count") +
     facet_wrap(. ~ feature, scales = 'free') +
     labs(x = "Features",
          y = "Counts",
