@@ -2,7 +2,7 @@
 # This Dockerfile will install the versions of R,Python and all packages in both that are required for running analysis.
 FROM rocker/tidyverse:4.0.3
 
-# Get R packages set to proper versions.
+
 ENV RENV_VERSION 0.12.2
 RUN R -e "install.packages('renv', version='${RENV_VERSION}')"
 
@@ -12,6 +12,10 @@ WORKDIR /home/seismophobia
 # Copy all renv setup files into container for restoring library.
 COPY renv.lock .Rprofile ./
 COPY renv/settings.dcf renv/activate.R renv/
+# Get R packages set to proper versions.
+ENV RENV_PATHS_CACHE="/renv/cache"
+ENV RENV_CONFIG_USE_CACHE=TRUE  
+RUN R -e 'renv::consent(provided=TRUE)'
 RUN Rscript -e 'renv::restore()'
 
 # Get Make for re running analysis with Makefile
