@@ -43,7 +43,7 @@ Then re run the analysis using:
 ```
 docker run --rm -e PASSWORD="test" -v "/$(pwd)":/home/seismophobia/ dbandrews/seismophobia:latest make directory=/home/seismophobia all
 ```
-### Using Make, Conda & Renv
+### Using Make, Conda & R
 
 Ensure that you have installed GNU Make and it's on your PATH variable.
 
