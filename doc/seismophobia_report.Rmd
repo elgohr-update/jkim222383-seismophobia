@@ -50,7 +50,7 @@ knitr::include_graphics(here::here("visuals", "feature_distributions.png"))
 
 The survey respondents were fairly evenly split across ages categories and genders. The household income distribution was not uniform, but is likely a reflection of the US population's income distribution, that had a median value of $55,775 in 2015 [\@bureau\_2018]. The distribution across US regions was not uniform, possibly due to the fact that the list of regions is divided into geographic regions that don't necessarily have the same populations. For example, the Pacific region (Washington, Oregon, and California) has a population of 50.1 million compared to New England (Connecticut, Massachusetts, Maine, New Hampshire, Rhode Island, and Vermont) has a combined population of 14.7 million [\@bureau\_2019].
 
-```{r feature_distributions_across_response, fig.align = 'center', out.width = "80%", fig.cap = "Fig 2: The level of earthquake fear across demograhic features"}
+```{r feature_distributions_across_response, fig.align = 'center', out.width = "100%", fig.cap = "Fig 2: The level of earthquake fear across demograhic features"}
 knitr::include_graphics(here::here("visuals", "feature_distributions_across_response.png"))
 ```
 
@@ -70,7 +70,7 @@ Our models were a random forest classifier and a logistic regression which we co
 
 This means the models could identify who was afraid of earthquakes better than picking at random, and who was not afraid of earthquakes better than picking at random. Incorrect predictions were lower than when picking at random.
 
-```{r confusion_matrices, echo=FALSE, out.width="60%", out.height="60%", fig.cap="Fig 4: Confusion matrix for each model used",fig.show='hold',fig.align='center'}
+```{r confusion_matrices, echo=FALSE, out.width="50%", out.height="50%", fig.cap="Fig 4: Confusion matrix for each model used",fig.show='hold',fig.align='center'}
 knitr::include_graphics(c(here::here("visuals", "confusion_matrix_RandomForestClassifier.png"),
                           here::here("visuals", "confusion_matrix_LogisticRegression.png"),
                           here::here("visuals", "confusion_matrix_DummyClassifier.png")))
