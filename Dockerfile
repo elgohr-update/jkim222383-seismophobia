@@ -41,7 +41,6 @@ RUN conda env update -n base --file /home/seismophobia/seismophobia_conda_env.ym
 #----------------------------------Renv Setup -------------------------------------------------------------------------------------
 
 # Setup Constants - we'll use Rstudio's package manager to download binaries to speed things up.
-ENV RENV_VERSION 0.12.2
 
 # Manual R package installs. Tidyverse already installed------------------------------------------
 RUN install2.r --error \

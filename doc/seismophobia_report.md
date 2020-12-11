@@ -1,16 +1,15 @@
 Seismophobia Report
 ================
 Trevor Kinsey, Dustin Andrews, Dustin Burnham, Junghoo Kim
-
 2020/11/26
 
--   [Summary](#summary)
--   [Introduction](#introduction)
--   [Methods](#methods)
--   [Data](#data)
--   [Analysis](#analysis)
--   [Results](#results)
--   [References](#references)
+  - [Summary](#summary)
+  - [Introduction](#introduction)
+  - [Methods](#methods)
+  - [Data](#data)
+  - [Analysis](#analysis)
+  - [Results](#results)
+  - [References](#references)
 
 ## Summary
 
@@ -50,22 +49,25 @@ respondents in the US.
 
 The data set contains
 
--   demographic information (age, gender, household income, region of
+  - demographic information (age, gender, household income, region of
     residence in the United States),
 
--   responses to questions relating to knowledge of and experience with
+  - responses to questions relating to knowledge of and experience with
     earthquakes,
 
--   self-reported level of fear of earthquakes.
+  - self-reported level of fear of earthquakes.
 
 Some preliminary examination of the data shows some relation between the
 demographic features and earthquake fear.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/feature_distributions.png" alt="Fig 1: Distribution of demographic information among survey respondents" width="75%" />
+<img src="/home/seismophobia/visuals/feature_distributions.png" alt="Fig 1: Distribution of demographic information among survey respondents" width="75%" />
+
 <p class="caption">
+
 Fig 1: Distribution of demographic information among survey respondents
+
 </p>
 
 </div>
@@ -83,9 +85,12 @@ and Vermont) has a combined population of 14.7 million (Bureau 2019).
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/feature_distributions_across_response.png" alt="Fig 2: The level of earthquake fear across demograhic features" width="75%" />
+<img src="/home/seismophobia/visuals/feature_distributions_across_response.png" alt="Fig 2: The level of earthquake fear across demograhic features" width="75%" />
+
 <p class="caption">
+
 Fig 2: The level of earthquake fear across demograhic features
+
 </p>
 
 </div>
@@ -97,9 +102,12 @@ more people who were not afraid of earthquakes than were afraid.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/target_distribution.png" alt="Fig 3: The distribution of earthquake fear among respondents" width="25%" />
+<img src="/home/seismophobia/visuals/target_distribution.png" alt="Fig 3: The distribution of earthquake fear among respondents" width="25%" />
+
 <p class="caption">
+
 Fig 3: The distribution of earthquake fear among respondents
+
 </p>
 
 </div>
@@ -132,10 +140,13 @@ negatives.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/confusion_matrix_DummyClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" /><img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/confusion_matrix_RandomForestClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" /><img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/confusion_matrix_LogisticRegression.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" />
+<img src="/home/seismophobia/visuals/confusion_matrix_DummyClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" /><img src="/home/seismophobia/visuals/confusion_matrix_RandomForestClassifier.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" /><img src="/home/seismophobia/visuals/confusion_matrix_LogisticRegression.png" alt="Fig 4: Confusion matrix for dummy classifier and random forest classifier" width="40%" height="40%" />
+
 <p class="caption">
+
 Fig 4: Confusion matrix for dummy classifier and random forest
 classifier
+
 </p>
 
 </div>
@@ -145,9 +156,12 @@ slightly higher F1 scores for our models than the dummy classifier.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/classifier_results_table.png" alt="Fig 5: Classifier F1 scores" width="40%" height="40%" />
+<img src="/home/seismophobia/visuals/classifier_results_table.png" alt="Fig 5: Classifier F1 scores" width="40%" height="40%" />
+
 <p class="caption">
+
 Fig 5: Classifier F1 scores
+
 </p>
 
 </div>
@@ -159,9 +173,12 @@ random, but not a by lot.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/roc_auc_curve_DummyClassifier.png" alt="Fig 6: ROC curves for various models" width="50%" height="50%" /><img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/roc_auc_curve_RandomForestClassifier.png" alt="Fig 6: ROC curves for various models" width="50%" height="50%" /><img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/roc_auc_curve_LogisticRegression.png" alt="Fig 6: ROC curves for various models" width="50%" height="50%" />
+<img src="/home/seismophobia/visuals/roc_auc_curve_DummyClassifier.png" alt="Fig 6: ROC curves for various models" width="50%" height="50%" /><img src="/home/seismophobia/visuals/roc_auc_curve_RandomForestClassifier.png" alt="Fig 6: ROC curves for various models" width="50%" height="50%" /><img src="/home/seismophobia/visuals/roc_auc_curve_LogisticRegression.png" alt="Fig 6: ROC curves for various models" width="50%" height="50%" />
+
 <p class="caption">
+
 Fig 6: ROC curves for various models
+
 </p>
 
 </div>
@@ -173,9 +190,12 @@ each input to determine what is driving predictions.
 
 <div class="figure" style="text-align: center">
 
-<img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/shap_summary_plot_RandomForestClassifier.png" alt="Fig 7: SHAP plot for random forest and logistic regression classifiers" width="50%" height="50%" /><img src="C:/Users/Dustin/UBC Masters Data Science/DSCI 522 Data Workflows/seismophobia/visuals/shap_summary_plot_LogisticRegression.png" alt="Fig 7: SHAP plot for random forest and logistic regression classifiers" width="50%" height="50%" />
+<img src="/home/seismophobia/visuals/shap_summary_plot_RandomForestClassifier.png" alt="Fig 7: SHAP plot for random forest and logistic regression classifiers" width="50%" height="50%" /><img src="/home/seismophobia/visuals/shap_summary_plot_LogisticRegression.png" alt="Fig 7: SHAP plot for random forest and logistic regression classifiers" width="50%" height="50%" />
+
 <p class="caption">
+
 Fig 7: SHAP plot for random forest and logistic regression classifiers
+
 </p>
 
 </div>
@@ -200,9 +220,9 @@ the analysis and create this report can be found at:
 
 ## References
 
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references">
 
-<div id="ref-bureau_2018" class="csl-entry">
+<div id="ref-bureau_2018">
 
 Bureau, US Census. 2018. “Income and Poverty in the United States:
 2015.” *The United States Census Bureau*.
@@ -210,7 +230,7 @@ Bureau, US Census. 2018. “Income and Poverty in the United States:
 
 </div>
 
-<div id="ref-bureau_2019" class="csl-entry">
+<div id="ref-bureau_2019">
 
 ———. 2019. “State Population Totals: 2010-2019.” *The United States
 Census Bureau*.
@@ -218,17 +238,16 @@ Census Bureau*.
 
 </div>
 
-<div id="ref-doi.org/10.1111/j.1559-1816.1992.tb00984.x"
-class="csl-entry">
+<div id="ref-doi.org/10.1111/j.1559-1816.1992.tb00984.x">
 
 Dooley, David, Ralph Catalano, Shiraz Mishra, and Seth Serxner. 1992.
 “Earthquake Preparedness: Predictors in a Community Survey1.” *Journal
 of Applied Social Psychology* 22 (6): 451–70.
-https://doi.org/<https://doi.org/10.1111/j.1559-1816.1992.tb00984.x>.
+<https://doi.org/https://doi.org/10.1111/j.1559-1816.1992.tb00984.x>.
 
 </div>
 
-<div id="ref-72124acf2fa84e8aad36e68d0dc4c5e6" class="csl-entry">
+<div id="ref-72124acf2fa84e8aad36e68d0dc4c5e6">
 
 Paton, D, J Mcclure, and Petra Buergelt. 2006. “Natural Hazard
 Resilience: The Role of Individual and Household Preparedness.” In
@@ -237,7 +256,7 @@ and David Johnston, 105–27. Charles C Thomas Publisher, Ltd.
 
 </div>
 
-<div id="ref-scikit-learn" class="csl-entry">
+<div id="ref-scikit-learn">
 
 Pedregosa, F., G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O.
 Grisel, M. Blondel, et al. 2011. “Scikit-Learn: Machine Learning in
@@ -245,7 +264,7 @@ Python.” *Journal of Machine Learning Research* 12: 2825–30.
 
 </div>
 
-<div id="ref-R" class="csl-entry">
+<div id="ref-R">
 
 R Core Team. 2019. *R: A Language and Environment for Statistical
 Computing*. Vienna, Austria: R Foundation for Statistical Computing.
@@ -253,28 +272,28 @@ Computing*. Vienna, Austria: R Foundation for Statistical Computing.
 
 </div>
 
-<div id="ref-reback2020pandas" class="csl-entry">
+<div id="ref-reback2020pandas">
 
 team, The pandas development. 2020. *Pandas-Dev/Pandas: Pandas* (version
 latest). Zenodo. <https://doi.org/10.5281/zenodo.3509134>.
 
 </div>
 
-<div id="ref-van1995python" class="csl-entry">
+<div id="ref-van1995python">
 
 Van Rossum, Guido, and Fred L Drake Jr. 1995. *Python Tutorial*. Centrum
 voor Wiskunde en Informatica Amsterdam, The Netherlands.
 
 </div>
 
-<div id="ref-tidyverse" class="csl-entry">
+<div id="ref-tidyverse">
 
 Wickham, Hadley. 2017. *Tidyverse: Easily Install and Load the
 ’Tidyverse’*. <https://CRAN.R-project.org/package=tidyverse>.
 
 </div>
 
-<div id="ref-knitr" class="csl-entry">
+<div id="ref-knitr">
 
 Xie, Yihui. 2014. “Knitr: A Comprehensive Tool for Reproducible Research
 in R.” In *Implementing Reproducible Computational Research*, edited by

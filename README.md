@@ -53,12 +53,23 @@ Clone this GitHub repository, and install the required conda dependencies by con
 $ conda env create -f seismophobia_conda_env.yml
 ```
 
-Then for the R scripts, open the Rstudio `seismophobia.Rproj` file in Rstudio. From the console run:
+For the R scripts install:
+R Version: 4.0.3
 
-```r
-> renv::restore()
-```
-You should have all needed R packages installed into a local library in `seismophobia/renv/` now. All R package versions can be found in `renv.lock` if needed.
+Packages:
+ggthemes_4.2.0 
+testthat_2.3.2  
+here_1.0.0      
+docopt_0.7.1    
+forcats_0.5.0   
+stringr_1.4.0   
+dplyr_1.0.2     
+purrr_0.3.4    
+readr_1.4.0     
+tidyr_1.1.2     
+tibble_3.0.4    
+ggplot2_3.3.0   
+tidyverse_1.3.0
 
 Then, you can re run the analysis from the root of the repo using:
 
