@@ -54,9 +54,11 @@ $ conda env create -f seismophobia_conda_env.yml
 ```
 
 For the R scripts install:
+
 R Version: 4.0.3
 
-Packages:
+R Packages:
+
 ggthemes_4.2.0 
 testthat_2.3.2  
 here_1.0.0      
