@@ -38,9 +38,8 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux
 COPY seismophobia_conda_env.yml* /home/seismophobia/
 RUN conda env update -n base --file /home/seismophobia/seismophobia_conda_env.yml 
 
-#----------------------------------Renv Setup -------------------------------------------------------------------------------------
+#----------------------------------R Setup -------------------------------------------------------------------------------------
 
-# Setup Constants - we'll use Rstudio's package manager to download binaries to speed things up.
 
 # Manual R package installs. Tidyverse already installed------------------------------------------
 RUN install2.r --error \
@@ -52,29 +51,6 @@ RUN install2.r --error \
     ggthemes \
     testthat 
 
-# Setup using Renv
 WORKDIR /home/seismophobia
-
-## PREVIOUS ATTEMPT: Copy all renv setup files into container for restoring library.
-# COPY renv.lock .Rprofile ./
-# COPY renv/settings.dcf renv/activate.R renv/
-# # Get R packages set to proper versions.
-# ENV RENV_PATHS_CACHE="/renv/cache"
-# ENV RENV_CONFIG_USE_CACHE=TRUE  
-
-## NEW ATTEMPT: Initialize using renv inside the container, then copy in renv.lock file for building library
-# RUN R -e 'renv::consent(provided=TRUE)'
-# RUN R -e "options(renv.config.cache.symlinks = FALSE)"
-# RUN R -e 'renv::init(bare=TRUE)'
-# COPY renv.lock renv.lock
-# RUN Rscript -e 'renv::restore()'
-# RUN Rscript -e "renv::isolate()"
-
-# COPY renv.lock renv.lock
-# RUN Rscript -e "install.packages('remotes', repos = c(CRAN = Sys.getenv('CRAN_REPO')))"
-# RUN Rscript -e "remotes::install_github('rstudio/renv', ref = Sys.getenv('RENV_VERSION'))"
-# RUN Rscript -e "renv::restore(repos = c(CRAN = Sys.getenv('CRAN_REPO')))"
-
-#
 
 CMD [ "/bin/bash" ]
