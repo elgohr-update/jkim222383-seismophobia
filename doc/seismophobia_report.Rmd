@@ -101,7 +101,7 @@ knitr::include_graphics(c(here::here("visuals", "shap_summary_plot_RandomForestC
 
 The next feature that both models identified as predictive of a positive fear response was age, with younger people showing more fear than older people. Looking at the two variables for gender, our model predicts women are more likely to be afraid of earthquakes than men.
 
-With the data that we have, our models were not effective in identifying people who are afraid of earthquakes with a high degree of certainty. However, because our data set had only four features, we believe there is potential for improved predictions if we had a more comprehensive data set that contains more demographic features and a larger sample size. This would require collecting more information in the form of a larger survey.
+With the data that we have, our models were not effective in identifying people who are afraid of earthquakes with a high degree of certainty. However, because our data set had only four features, we believe there is potential for improved predictions if we had a more comprehensive data set. This would require collecting more information in the form of a larger survey.
 
 The R [\@R] and Python [\@van1995python] programming languages and the following Python packages were used for this project: pandas [\@reback2020pandas], sklearn [\@scikit-learn], tidyverse [\@tidyverse], and knitr [\@knitr]. The code used to perform the analysis and create this report can be found at: <https://github.com/UBC-MDS/seismophobia>
 
