@@ -103,7 +103,7 @@ def run_modelling(
     # TODO: Specify return type (Pipeline for best performing model)
     """
     # For reproducibility set seed
-    random.seed(42)
+    np.random.seed(42)
 
     # Build dataframes for training
     X_train, y_train = (
@@ -120,9 +120,13 @@ def run_modelling(
     ordinal = ["age", "household_income"]
     categorical = ["us_region", "gender"]
 
-    ordinal_pipe = make_pipeline(SimpleImputer(strategy="most_frequent"), OrdinalEncoder())
-    categorical_pipe = make_pipeline(SimpleImputer(strategy="most_frequent"), OneHotEncoder())
-    
+    ordinal_pipe = make_pipeline(
+        SimpleImputer(strategy="most_frequent"), OrdinalEncoder()
+    )
+    categorical_pipe = make_pipeline(
+        SimpleImputer(strategy="most_frequent"), OneHotEncoder()
+    )
+
     preprocessor = ColumnTransformer(
         transformers=[
             ("categorical", categorical_pipe, categorical),
@@ -133,9 +137,9 @@ def run_modelling(
 
     # List of the classifiers to be used
     classifiers = [
-        DummyClassifier(strategy='stratified'),
-        RandomForestClassifier(),
-        LogisticRegression(max_iter = 3000),
+        DummyClassifier(strategy="stratified"),
+        RandomForestClassifier(random_state=42),
+        LogisticRegression(max_iter=3000, random_state=42),
     ]
 
     # Pipeline tuning settings--------------------------
@@ -150,9 +154,7 @@ def run_modelling(
     }
     # TODO: Edit if tuning hparams for classifier 2
     # Param dists for classifier 2
-    param_dists[2] = {
-        "C": scipy.stats.loguniform(1e-3, 1e3)
-    }
+    param_dists[2] = {"C": scipy.stats.loguniform(1e-3, 1e3)}
 
     # Settings for RandomizedSearchCV
     # TODO: Change later
@@ -163,7 +165,7 @@ def run_modelling(
     # List of classifier names for quick reference
     clf_names = []
     # Dictionary of classifiers
-    model_dict = {} 
+    model_dict = {}
     # Build pipelines
     for i in range(len(classifiers)):
         classifier_name = str(classifiers[i]).split("(")[0]
@@ -175,10 +177,10 @@ def run_modelling(
             preprocessor=preprocessor,
             cv=cv,
             scoring=scoring,
-            n_iter_final=n_iter_final
+            n_iter_final=n_iter_final,
         )
         model_dict[classifier_name] = pipe
-        
+
     # Summary Scores
     summary_score = {}
     for clf in model_dict.keys():
@@ -188,9 +190,11 @@ def run_modelling(
     # Summary table ---------------------------------------------
     # TODO: This could be done better, in a function maybe
     summary_df = pd.DataFrame(
-        data=[np.round(summary_score["LogisticRegression"], 3), 
-        np.round(summary_score["RandomForestClassifier"], 3), 
-        np.round(summary_score["DummyClassifier"], 3)],
+        data=[
+            np.round(summary_score["LogisticRegression"], 3),
+            np.round(summary_score["RandomForestClassifier"], 3),
+            np.round(summary_score["DummyClassifier"], 3),
+        ],
         index=["LogisticRegression", "RandomForest", "DummyClassifier"],
         columns=["F1 Score"],
     )
@@ -240,16 +244,14 @@ def run_modelling(
             visuals_path=visuals_path,
         )
 
-    return 
-
-
+    return
 
 
 def build_pipeline(
     base_classifier: ClassifierMixin,
-    classifier_name : str,
+    classifier_name: str,
     param_dists: dict,
-    preprocessor, #sklearn.compose._column_transformer.ColumnTransformer,
+    preprocessor,  # sklearn.compose._column_transformer.ColumnTransformer,
     cv: int = 5,
     scoring: str = "f1",
     n_iter_final: int = 10,
@@ -281,11 +283,11 @@ def build_pipeline(
     Pipeline:
         a sklearn pipeline ready to be fit
     """
-    
+
     # This pipeline will run the preprocessing and
     # uses RandomizedSearchCV search of hyperparameters
     # on the specified classifier
-        
+
     # If DummyClassifier, don't do any tuning
     if classifier_name == "DummyClassifier":
         main_pipe = make_pipeline(preprocessor, base_classifier)
@@ -301,11 +303,10 @@ def build_pipeline(
                 n_iter=n_iter_final,
                 verbose=1,
                 n_jobs=-2,
-            )
+            ),
         )
-       
-    return main_pipe
 
+    return main_pipe
 
 
 def build_roc_plot(
@@ -397,9 +398,9 @@ def build_shap_plot(
         path to save plot to.
     """
 
-    #TODO: add more descriptive comments and abstract away some objects into arguments or global constants
-    
-    preprocessor = classifier.named_steps['columntransformer']
+    # TODO: add more descriptive comments and abstract away some objects into arguments or global constants
+
+    preprocessor = classifier.named_steps["columntransformer"]
 
     preprocessor.fit(X, y)
 
@@ -413,17 +414,20 @@ def build_shap_plot(
     if classifier_name == "LogisticRegression":
         # TODO: fix this
         X_enc = shap.sample(X_enc, 50)
-        explainer = shap.KernelExplainer(classifier.named_steps['randomizedsearchcv'].best_estimator_.predict_proba, data=X_enc)
+        explainer = shap.KernelExplainer(
+            classifier.named_steps["randomizedsearchcv"].best_estimator_.predict_proba,
+            data=X_enc,
+        )
     else:
-        explainer = shap.TreeExplainer(classifier.named_steps['randomizedsearchcv'].best_estimator_)
+        explainer = shap.TreeExplainer(
+            classifier.named_steps["randomizedsearchcv"].best_estimator_
+        )
 
     fig, ax = plt.subplots()
 
     shap_values = np.array(explainer.shap_values(X_enc))
 
-    shap.summary_plot(
-        shap_values[-1], X_enc, show=False
-    )
+    shap.summary_plot(shap_values[-1], X_enc, show=False)
     ax.set_title(f"SHAP Summary Plot on {classifier_name}")
     fig.savefig(
         os.path.join(visuals_path, f"shap_summary_plot_{classifier_name}.png"),
@@ -431,7 +435,7 @@ def build_shap_plot(
     )
 
 
-def test_visuals_saved(visuals_path : str) -> None:
+def test_visuals_saved(visuals_path: str) -> None:
     """Tests that the tables, plots are created in specified path
 
     Parameters
@@ -447,12 +451,23 @@ def test_visuals_saved(visuals_path : str) -> None:
     -------
     AssertionError : If tests fail
     """
-    files = ['classifier_results_table.png', 'confusion_matrix_DummyClassifier.png', 'confusion_matrix_LogisticRegression.png',
-             'confusion_matrix_RandomForestClassifier.png', 'roc_auc_curve_DummyClassifier.png', 'roc_auc_curve_LogisticRegression.png',
-             'roc_auc_curve_RandomForestClassifier.png', 'shap_summary_plot_LogisticRegression.png', 'shap_summary_plot_RandomForestClassifier.png']
+    files = [
+        "classifier_results_table.png",
+        "confusion_matrix_DummyClassifier.png",
+        "confusion_matrix_LogisticRegression.png",
+        "confusion_matrix_RandomForestClassifier.png",
+        "roc_auc_curve_DummyClassifier.png",
+        "roc_auc_curve_LogisticRegression.png",
+        "roc_auc_curve_RandomForestClassifier.png",
+        "shap_summary_plot_LogisticRegression.png",
+        "shap_summary_plot_RandomForestClassifier.png",
+    ]
     for visual in files:
-        assert os.path.isfile(os.path.join(visuals_path, visual)), "File is not created at the specified path"
+        assert os.path.isfile(
+            os.path.join(visuals_path, visual)
+        ), "File is not created at the specified path"
     print("Tests passed: all visuals created!")
+
 
 if __name__ == "__main__":
     opt = docopt(__doc__)
